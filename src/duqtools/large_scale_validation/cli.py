@@ -4,7 +4,13 @@ import logging
 
 import click
 
-from ..cli import common_options, dry_run_option, logging_options, variables_option, yes_option
+from ..cli import (
+    common_options,
+    dry_run_option,
+    logging_options,
+    variables_option,
+    yes_option,
+)
 from ..operations import op_queue_context
 
 logger = logging.getLogger(__name__)

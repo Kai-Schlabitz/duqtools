@@ -11,7 +11,11 @@ import click
 from pydantic import ValidationError
 
 from ._click_opt_groups import GroupCmd, GroupOpt
-from ._logging_utils import TermEscapeCodeFormatter, duqlog_screen, initialize_duqlog_screen
+from ._logging_utils import (
+    TermEscapeCodeFormatter,
+    duqlog_screen,
+    initialize_duqlog_screen,
+)
 from .config import CFG, load_config
 from .operations import op_queue, op_queue_context
 

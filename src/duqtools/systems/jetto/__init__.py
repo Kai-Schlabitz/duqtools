@@ -12,7 +12,12 @@ from ._models import (
     NamelistField,
 )
 from ._schema import JettoSystemModel
-from ._system import BaseJettoSystem, JettoSystem, JettoSystemV210921, JettoSystemV220922
+from ._system import (
+    BaseJettoSystem,
+    JettoSystem,
+    JettoSystemV210921,
+    JettoSystemV220922,
+)
 
 __all__ = [
     'BaseJettoSystem',

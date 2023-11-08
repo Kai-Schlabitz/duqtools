@@ -23,7 +23,12 @@ from duqtools.schema import (
     OperationDim,
 )
 from duqtools.schema.data_location import DataLocation
-from duqtools.systems.jetto import JettoVar, JettoVariableModel, JsetField, NamelistField
+from duqtools.systems.jetto import (
+    JettoVar,
+    JettoVariableModel,
+    JsetField,
+    NamelistField,
+)
 from duqtools.systems.models import StatusConfigModel, SubmitConfigModel
 
 this_dir = Path(__file__).parent

@@ -10,8 +10,9 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from jetto_tools import config, jset, lookup, namelist, template
+from jetto_tools import config
 from jetto_tools import job as jetto_job
+from jetto_tools import jset, lookup, namelist, template
 from jetto_tools.template import _EXTRA_FILE_REGEXES
 
 from duqtools.operations import add_to_op_queue
