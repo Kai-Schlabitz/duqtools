@@ -26,114 +26,131 @@ logger = logging.getLogger(__name__)
 
 try:
     import coverage
+
     coverage.process_startup()
 except ImportError:
     pass
 
 
 def config_option(f):
-    return click.option('-c',
-                        '--config',
-                        default='duqtools.yaml',
-                        help='Path to config.',
-                        cls=GroupOpt,
-                        group='Common options')(f)
+    return click.option(
+        "-c",
+        "--config",
+        default="duqtools.yaml",
+        help="Path to config.",
+        cls=GroupOpt,
+        group="Common options",
+    )(f)
 
 
 def quiet_option(f):
-    return click.option('-q',
-                        '--quiet',
-                        is_flag=True,
-                        default=False,
-                        help='Don\'t output anything to the screen'
-                        ' (except mandatory prompts).',
-                        cls=GroupOpt,
-                        group='Common options')(f)
+    return click.option(
+        "-q",
+        "--quiet",
+        is_flag=True,
+        default=False,
+        help="Don't output anything to the screen" " (except mandatory prompts).",
+        cls=GroupOpt,
+        group="Common options",
+    )(f)
 
 
 def debug_option(f):
     """Must be added together with `logfile_option`."""
-    return click.option('--debug',
-                        is_flag=True,
-                        help='Enable debug print statements.',
-                        cls=GroupOpt,
-                        group='Common options')(f)
+    return click.option(
+        "--debug",
+        is_flag=True,
+        help="Enable debug print statements.",
+        cls=GroupOpt,
+        group="Common options",
+    )(f)
 
 
 def dry_run_option(f):
-    return click.option('--dry-run',
-                        is_flag=True,
-                        help='Execute without any side-effects.',
-                        cls=GroupOpt,
-                        group='Common options')(f)
+    return click.option(
+        "--dry-run",
+        is_flag=True,
+        help="Execute without any side-effects.",
+        cls=GroupOpt,
+        group="Common options",
+    )(f)
 
 
 def yes_option(f):
-    return click.option('--yes',
-                        is_flag=True,
-                        help='Answer yes to questions automatically.',
-                        cls=GroupOpt,
-                        group='Common options')(f)
+    return click.option(
+        "--yes",
+        is_flag=True,
+        help="Answer yes to questions automatically.",
+        cls=GroupOpt,
+        group="Common options",
+    )(f)
 
 
 def logfile_option(f):
     """Must be added together with `debug_option`."""
-    return click.option('--logfile',
-                        '-l',
-                        is_flag=False,
-                        default='duqtools.log',
-                        help='where to send the logfile,'
-                        ' the special values stderr/stdout'
-                        ' will send it there respectively.',
-                        cls=GroupOpt,
-                        group='Common options')(f)
+    return click.option(
+        "--logfile",
+        "-l",
+        is_flag=False,
+        default="duqtools.log",
+        help="where to send the logfile,"
+        " the special values stderr/stdout"
+        " will send it there respectively.",
+        cls=GroupOpt,
+        group="Common options",
+    )(f)
 
 
 logging_options = (logfile_option, debug_option)
-all_options = (*logging_options, config_option, quiet_option, dry_run_option,
-               yes_option)
+all_options = (
+    *logging_options,
+    config_option,
+    quiet_option,
+    dry_run_option,
+    yes_option,
+)
 
 
 def handles_option(f):
-    return click.option('-h',
-                        '--handle',
-                        'handles',
-                        type=str,
-                        help='IMAS data handles.',
-                        multiple=True)(f)
+    return click.option(
+        "-h", "--handle", "handles", type=str, help="IMAS data handles.", multiple=True
+    )(f)
 
 
 def variables_option(f):
-    return click.option('-v',
-                        '--variable',
-                        'var_names',
-                        type=str,
-                        help='Name of the variables.',
-                        multiple=True)(f)
+    return click.option(
+        "-v",
+        "--variable",
+        "var_names",
+        type=str,
+        help="Name of the variables.",
+        multiple=True,
+    )(f)
 
 
 def datafile_option(f):
-    return click.option('-i',
-                        '--input',
-                        'input_files',
-                        type=str,
-                        help='Input file, i.e. `data.csv` or `runs.yaml`',
-                        multiple=True)(f)
+    return click.option(
+        "-i",
+        "--input",
+        "input_files",
+        type=str,
+        help="Input file, i.e. `data.csv` or `runs.yaml`",
+        multiple=True,
+    )(f)
 
 
 class OptionParser:
-
     def wrap(self, func: Callable):
         """With this wrapper it becomes possible to parse common options in
         user defined order."""
 
         def callback(**kwargs):
             for parse in (
-                    self.parse_config,
-                    self.parse_logfile,
-                    self.parse_yes,
-                    self.parse_dry_run,
-                    self.parse_quiet,
+                self.parse_config,
+                self.parse_logfile,
+                self.parse_yes,
+                self.parse_dry_run,
+                self.parse_quiet,
             ):
                 try:
                     parse(**kwargs)
@@ -147,7 +164,7 @@ class OptionParser:
     def parse_logfile(self, *, logfile, debug, **kwargs):
         level = logging.DEBUG if debug else logging.INFO
 
-        streams = {'stdout': stdout, 'stderr': stderr}
+        streams = {"stdout": stdout, "stderr": stderr}
         logging.getLogger().handlers = []
 
         if logfile in streams.keys():
@@ -161,12 +178,13 @@ class OptionParser:
             fhandler.setFormatter(escaped_format)
             logging.getLogger().addHandler(fhandler)
 
-        logger.info('')
+        logger.info("")
         logger.info(
-            'Duqtools starting at '
-            f'{datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %z")}')
-        logger.info('------------------------------------------------')
-        logger.info('')
+            "Duqtools starting at "
+            f'{datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %z")}'
+        )
+        logger.info("------------------------------------------------")
+        logger.info("")
 
     def parse_quiet(self, *, quiet, **kwargs):
         if quiet:
@@ -211,6 +229,7 @@ def common_options(*options):
 
 def cli_entry(**kwargs):
     from duqtools import fix_dependencies
+
     fix_dependencies()
     cli()
 
@@ -236,17 +255,20 @@ def cli(**kwargs):
     pass
 
 
-@cli.command('init', cls=GroupCmd)
-@click.option('-o',
-              '--out',
-              'out_file',
-              help='Path to write config to (default=duqtools.yaml).',
-              default='duqtools.yaml')
-@click.option('--force', is_flag=True, help='Overwrite existing config.')
+@cli.command("init", cls=GroupCmd)
+@click.option(
+    "-o",
+    "--out",
+    "out_file",
+    help="Path to write config to (default=duqtools.yaml).",
+    default="duqtools.yaml",
+)
+@click.option("--force", is_flag=True, help="Overwrite existing config.")
 @common_options(*logging_options, quiet_option, dry_run_option, yes_option)
 def cli_init(**kwargs):
     """Create a default config file."""
     from .init import init
+
     with op_queue_context():
         try:
             init(**kwargs)
@@ -254,49 +276,53 @@ def cli_init(**kwargs):
             exit(e)
 
 
-@cli.command('setup')
+@cli.command("setup")
 @click.option(
-    '-r',
-    '--run_name',
+    "-r",
+    "--run_name",
     type=str,
-    help='Name of the run.',
-    default='duqtools',
+    help="Name of the run.",
+    default="duqtools",
 )
 @click.option(
-    '-t',
-    '--template',
-    'template_file',
+    "-t",
+    "--template",
+    "template_file",
     type=click.Path(exists=True),
-    help='Template duqtools.yaml',
-    default='duqtools.template.yaml',
+    help="Template duqtools.yaml",
+    default="duqtools.template.yaml",
 )
-@click.option('-h', '--handle', 'handle', type=str, help='IMAS data handle.')
-@click.option('--force', is_flag=True, help='Overwrite existing config')
+@click.option("-h", "--handle", "handle", type=str, help="IMAS data handle.")
+@click.option("--force", is_flag=True, help="Overwrite existing config")
 @common_options(*logging_options, yes_option)
 def cli_setup(**kwargs):
     """Template substitution for duqtools config."""
     from .setup import setup
+
     with op_queue_context():
         setup(**kwargs)
 
 
-@cli.command('create', cls=GroupCmd)
-@click.option('--force',
-              is_flag=True,
-              help='Overwrite existing run directories and IDS data.')
-@click.option('--no-sampling',
-              is_flag=True,
-              help='Create base run (ignores `dimensions`/`sampler`).')
+@cli.command("create", cls=GroupCmd)
+@click.option(
+    "--force", is_flag=True, help="Overwrite existing run directories and IDS data."
+)
+@click.option(
+    "--no-sampling",
+    is_flag=True,
+    help="Create base run (ignores `dimensions`/`sampler`).",
+)
 @common_options(*all_options)
 def cli_create(**kwargs):
     """Create the UQ run files."""
     from .create import create
+
     with op_queue_context():
         create(cfg=CFG, **kwargs)
 
 
-@cli.command('recreate', cls=GroupCmd)
-@click.argument('runs', type=Path, nargs=-1)
+@cli.command("recreate", cls=GroupCmd)
+@click.argument("runs", type=Path, nargs=-1)
 @common_options(*all_options)
 def cli_recreate(**kwargs):
     """Read `runs.yaml` and re-create the given runs.
@@ -307,47 +333,54 @@ def cli_recreate(**kwargs):
     - `duqtools recreate run_0003 run_0004 --force`
     """
     from .create import recreate
+
     with op_queue_context():
         recreate(cfg=CFG, **kwargs)
 
 
-@cli.command('submit', cls=GroupCmd)
-@click.option('--force',
-              is_flag=True,
-              help='Re-submit running or completed jobs.')
-@click.option('--schedule',
-              is_flag=True,
-              help=('Schedule and submit jobs automatically.'))
-@click.option('-j',
-              '--max_jobs',
-              type=int,
-              help='Maximum number of jobs running simultaneously.',
-              default=10)
+@cli.command("submit", cls=GroupCmd)
+@click.option("--force", is_flag=True, help="Re-submit running or completed jobs.")
 @click.option(
-    '--max_array_size',
+    "--schedule", is_flag=True, help=("Schedule and submit jobs automatically.")
+)
+@click.option(
+    "-j",
+    "--max_jobs",
+    type=int,
+    help="Maximum number of jobs running simultaneously.",
+    default=10,
+)
+@click.option(
+    "--max_array_size",
     type=int,
     default=100,
-    help='Maximum array size for slurm (usually 1001, default = 100).')
-@click.option('-a', '--array', is_flag=True, help=('Submit jobs as array. '))
-@click.option('--array-script',
-              is_flag=True,
-              help=('Create script to submit jobs as array. '
-                    'Like --array, but does not submit.'))
-@click.option('--limit',
-              type=int,
-              help=('Limits total number of jobs to submit.'))
-@click.option('-r',
-              '--resubmit',
-              multiple=True,
-              default=tuple(),
-              type=Path,
-              help='Case to re-submit, can be specified multiple times')
-@click.option('-s',
-              '--status',
-              'status_filter',
-              type=str,
-              multiple=True,
-              help='Only submit jobs with this status.')
+    help="Maximum array size for slurm (usually 1001, default = 100).",
+)
+@click.option("-a", "--array", is_flag=True, help=("Submit jobs as array. "))
+@click.option(
+    "--array-script",
+    is_flag=True,
+    help=(
+        "Create script to submit jobs as array. " "Like --array, but does not submit."
+    ),
+)
+@click.option("--limit", type=int, help=("Limits total number of jobs to submit."))
+@click.option(
+    "-r",
+    "--resubmit",
+    multiple=True,
+    default=tuple(),
+    type=Path,
+    help="Case to re-submit, can be specified multiple times",
+)
+@click.option(
+    "-s",
+    "--status",
+    "status_filter",
+    type=str,
+    multiple=True,
+    help="Only submit jobs with this status.",
+)
 @common_options(*all_options)
 def cli_submit(**kwargs):
     """Submit the UQ runs.
@@ -362,12 +395,13 @@ def cli_submit(**kwargs):
     spot.
     """
     from .submit import submit
+
     with op_queue_context():
         submit(cfg=CFG, **kwargs)
 
 
-@cli.command('sync_prominence', cls=GroupCmd)
-@click.option('--force', is_flag=True, help='Overwrite data if necessary')
+@cli.command("sync_prominence", cls=GroupCmd)
+@click.option("--force", is_flag=True, help="Overwrite data if necessary")
 @common_options(*all_options)
 def cli_sync_prominence(**kwargs):
     """Sync data back from prominence.
@@ -379,34 +413,35 @@ def cli_sync_prominence(**kwargs):
     can be used in further analysis.
     """
     from .sync_prominence import sync_prominence
+
     with op_queue_context():
         sync_prominence(cfg=CFG, **kwargs)
 
 
-@cli.command('status', cls=GroupCmd)
-@click.option('--detailed', is_flag=True, help='Detailed info on progress')
-@click.option('--progress', is_flag=True, help='Fancy progress bar')
+@cli.command("status", cls=GroupCmd)
+@click.option("--detailed", is_flag=True, help="Detailed info on progress")
+@click.option("--progress", is_flag=True, help="Fancy progress bar")
 @common_options(*all_options)
 def cli_status(**kwargs):
     """Print the status of the UQ runs."""
     from .status import status
+
     status(cfg=CFG, **kwargs)
 
 
-@cli.command('plot')
+@cli.command("plot")
 @handles_option
 @variables_option
-@click.option('-o',
-              '--format',
-              'extensions',
-              type=str,
-              help='Output format (json, html, png, svg, pdf), default: html.',
-              default=('html', ),
-              multiple=True)
-@click.option('-e',
-              '--errorbars',
-              is_flag=True,
-              help='Plot the errorbars (if present)')
+@click.option(
+    "-o",
+    "--format",
+    "extensions",
+    type=str,
+    help="Output format (json, html, png, svg, pdf), default: html.",
+    default=("html",),
+    multiple=True,
+)
+@click.option("-e", "--errorbars", is_flag=True, help="Plot the errorbars (if present)")
 @datafile_option
 @common_options(*logging_options)
 def cli_plot(**kwargs):
@@ -422,24 +457,24 @@ def cli_plot(**kwargs):
     - `duqtools plot -v zeff -h db/91234/5 -o json`
     """
     from .plot import plot
+
     plot(**kwargs)
 
 
-@cli.command('clean', cls=GroupCmd)
-@click.option('--out', is_flag=True, help='Remove output data.')
-@click.option('--force',
-              is_flag=True,
-              help='Overwrite backup file if necessary.')
+@cli.command("clean", cls=GroupCmd)
+@click.option("--out", is_flag=True, help="Remove output data.")
+@click.option("--force", is_flag=True, help="Overwrite backup file if necessary.")
 @common_options(*all_options)
 def cli_clean(**kwargs):
     """Delete generated IDS data and the run dir."""
     from .cleanup import cleanup
+
     with op_queue_context():
         cleanup(cfg=CFG, **kwargs)
 
 
-@cli.command('go', cls=GroupCmd)
-@click.option('--force', is_flag=True, help='Overwrite files when necessary.')
+@cli.command("go", cls=GroupCmd)
+@click.option("--force", is_flag=True, help="Overwrite files when necessary.")
 @common_options(*all_options)
 def cli_go(**kwargs):
     """Run create, submit, status, dash in succession.
@@ -450,57 +485,63 @@ def cli_go(**kwargs):
     from .dash import dash
     from .status import status
     from .submit import submit
+
     with op_queue_context():
         create(cfg=CFG, **kwargs)
     with op_queue_context():
-        submit(cfg=CFG,
-               max_jobs=None,
-               array=True,
-               schedule=None,
-               resubmit=tuple(),
-               **kwargs)
+        submit(
+            cfg=CFG,
+            max_jobs=None,
+            array=True,
+            schedule=None,
+            resubmit=tuple(),
+            **kwargs,
+        )
 
     skwargs = kwargs.copy()
-    skwargs['detailed'] = True
-    skwargs['progress'] = False
+    skwargs["detailed"] = True
+    skwargs["progress"] = False
     status(cfg=CFG, **skwargs)
 
     dash(**kwargs)
 
 
-@cli.command('yolo')
+@cli.command("yolo")
 @click.pass_context
 def cli_yolo(ctx, **kwargs):
     """Live on the edge, run `duqtools go --force --yes --quiet`."""
     ctx.invoke(cli_go, force=True, quiet=True, yes=True)
 
 
-@cli.command('dash', cls=GroupCmd)
+@cli.command("dash", cls=GroupCmd)
 @common_options(*logging_options, quiet_option, dry_run_option, yes_option)
 def cli_dash(**kwargs):
     """Open dashboard for evaluating IDS data."""
     from .dash import dash
+
     dash(**kwargs)
 
 
-@cli.command('merge', cls=GroupCmd)
+@cli.command("merge", cls=GroupCmd)
 @handles_option
 @variables_option
-@click.option('-t',
-              '--template',
-              required=True,
-              type=str,
-              help='IMAS location to use as the template for the target')
-@click.option('-o',
-              '--out',
-              'target',
-              required=True,
-              type=str,
-              help='IMAS location to store the result in')
+@click.option(
+    "-t",
+    "--template",
+    required=True,
+    type=str,
+    help="IMAS location to use as the template for the target",
+)
+@click.option(
+    "-o",
+    "--out",
+    "target",
+    required=True,
+    type=str,
+    help="IMAS location to store the result in",
+)
 @datafile_option
-@click.option('--force',
-              is_flag=True,
-              help='Overwrite existing output dataset.')
+@click.option("--force", is_flag=True, help="Overwrite existing output dataset.")
 @common_options(*all_options)
 def cli_merge(**kwargs):
     """Merge data sets with error propagation.
@@ -532,11 +573,12 @@ def cli_merge(**kwargs):
     Use `--variable` to select which variables to merge.
     """
     from .merge import merge
+
     with op_queue_context():
         merge(**kwargs)
 
 
-@cli.command('list-variables')
+@cli.command("list-variables")
 @config_option
 def cli_list_variables(config, **kwargs):
     """List available variables.
@@ -545,22 +587,23 @@ def cli_list_variables(config, **kwargs):
     directory.
     """
     from .list_variables import list_variables
+
     try:
         cfg = load_config(config)
     except FileNotFoundError:
-        print(f'Cannot find `{config}`.')
+        print(f"Cannot find `{config}`.")
         cfg = CFG
     list_variables(cfg=cfg, **kwargs)
 
 
-@cli.command('version')
+@cli.command("version")
 def cli_version(**kwargs):
     """Print the version and exit."""
     import git
 
     from duqtools import __version__
 
-    string = f'duqtools {__version__}'
+    string = f"duqtools {__version__}"
 
     try:
         repo = git.Repo(Path(__file__), search_parent_directories=True)
@@ -568,10 +611,10 @@ def cli_version(**kwargs):
     except OSError:
         pass
     else:
-        string += f' (rev: {sha})'
+        string += f" (rev: {sha})"
 
     click.echo(string)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

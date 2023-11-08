@@ -10,6 +10,6 @@ from ._schema import NoSystemModel
 from ._system import NoSystem
 
 __all__ = [
-    'NoSystem',
-    'NoSystemModel',
+    "NoSystem",
+    "NoSystemModel",
 ]

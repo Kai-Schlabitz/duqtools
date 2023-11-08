@@ -84,9 +84,7 @@ class nested_arr_t2:
 
 class Sample:
     profiles_1d = [profile_t0, profile_t1, profile_t2]
-    nested_profiles_1d = [
-        nested_profile_t0, nested_profile_t1, nested_profile_t2
-    ]
+    nested_profiles_1d = [nested_profile_t0, nested_profile_t1, nested_profile_t2]
 
     profiles_2d = [arr_t0, arr_t1, arr_t2]
     nested_profiles_2d = [nested_arr_t0, nested_arr_t1, nested_arr_t2]

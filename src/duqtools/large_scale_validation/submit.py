@@ -20,10 +20,20 @@ logger = logging.getLogger(__name__)
 info = logger.info
 
 
-def submit(*, array: bool, array_script: bool, limit: Optional[int],
-           force: bool, max_jobs: int, schedule: bool, max_array_size: int,
-           input_file: str, pattern: str, status_filter: Sequence[str],
-           **kwargs):
+def submit(
+    *,
+    array: bool,
+    array_script: bool,
+    limit: Optional[int],
+    force: bool,
+    max_jobs: int,
+    schedule: bool,
+    max_array_size: int,
+    input_file: str,
+    pattern: str,
+    status_filter: Sequence[str],
+    **kwargs,
+):
     """Submit nested duqtools configs.
 
     Parameters
@@ -51,7 +61,7 @@ def submit(*, array: bool, array_script: bool, limit: Optional[int],
         Only submit jobs with this status.
     """
     if pattern is None:
-        pattern = '**'
+        pattern = "**"
 
     handles = None
     if input_file:
@@ -59,12 +69,12 @@ def submit(*, array: bool, array_script: bool, limit: Optional[int],
 
     cwd = Path.cwd()
 
-    dirs = [file.parent for file in cwd.glob(f'{pattern}/runs.yaml')]
+    dirs = [file.parent for file in cwd.glob(f"{pattern}/runs.yaml")]
 
     jobs: list[Job] = []
 
     for drc in dirs:
-        config_file = drc / 'duqtools.yaml'
+        config_file = drc / "duqtools.yaml"
         cfg = load_config(config_file)
 
         assert cfg.create
@@ -77,7 +87,8 @@ def submit(*, array: bool, array_script: bool, limit: Optional[int],
 
         jobs.extend(
             Job(run.dirname, cfg=cfg)
-            for run in Locations(parent_dir=config_dir, cfg=cfg).runs)
+            for run in Locations(parent_dir=config_dir, cfg=cfg).runs
+        )
 
     job_queue: Deque[Job] = deque()
 
@@ -93,17 +104,19 @@ def submit(*, array: bool, array_script: bool, limit: Optional[int],
         job_queue.append(job)
 
         if len(job_queue) == limit:
-            info('Limiting total number of jobs to: %d', len(job_queue))
+            info("Limiting total number of jobs to: %d", len(job_queue))
             break
 
     if schedule:
         job_scheduler(job_queue, max_jobs=max_jobs)
     elif array or array_script:
-        job_array_submitter(job_queue,
-                            max_jobs=max_jobs,
-                            max_array_size=max_array_size,
-                            create_only=array_script,
-                            cfg=cfg)
+        job_array_submitter(
+            job_queue,
+            max_jobs=max_jobs,
+            max_array_size=max_array_size,
+            create_only=array_script,
+            cfg=cfg,
+        )
     else:
         job_submitter(job_queue, max_jobs=max_jobs)
 

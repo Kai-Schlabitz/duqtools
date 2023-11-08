@@ -20,7 +20,7 @@ from .systems import get_system
 
 logger = logging.getLogger(__name__)
 
-RUN_PREFIX = 'run_'
+RUN_PREFIX = "run_"
 
 
 class CreateError(Exception):
@@ -33,8 +33,8 @@ class CreateManager:
     def __init__(self, cfg: Config):
         self.cfg = cfg
         if not self.cfg.create:
-            logger.warning('No create options specified.')
-            raise CreateError('No create options specified in config.')
+            logger.warning("No create options specified.")
+            raise CreateError("No create options specified in config.")
 
         self.options = self.cfg.create
 
@@ -52,13 +52,12 @@ class CreateManager:
 
         if not template_data:
             if not self.template_drc:
-                raise ValueError('Missing `create.template`')
+                raise ValueError("Missing `create.template`")
             source = self.system.imas_from_path(self.template_drc)
         else:
-            source = ImasHandle.model_validate(template_data,
-                                               from_attributes=True)
+            source = ImasHandle.model_validate(template_data, from_attributes=True)
 
-        logger.info('Source data: %s', source)
+        logger.info("Source data: %s", source)
 
         return source
 
@@ -67,30 +66,28 @@ class CreateManager:
         base_ops = [op.convert() for op in self.options.operations]
         return base_ops
 
-    def generate_ops_dict(self,
-                          *,
-                          base_only: bool = False) -> dict[str, list[Any]]:
+    def generate_ops_dict(self, *, base_only: bool = False) -> dict[str, list[Any]]:
         """Generate set of operations for a run."""
         base_ops = self.get_base_ops()
 
         if base_only:
-            return {'base': base_ops}
+            return {"base": base_ops}
 
         matrix = tuple(model.expand() for model in self.options.dimensions)
         matrix_sampler = get_matrix_sampler(self.options.sampler.method)
 
-        sampled_ops_lists = matrix_sampler(*matrix,
-                                           **dict(self.options.sampler))
+        sampled_ops_lists = matrix_sampler(*matrix, **dict(self.options.sampler))
 
         ops_dict = {}
         for i, ops_list in enumerate(sampled_ops_lists):
-            name = f'{RUN_PREFIX}{i:04d}'
+            name = f"{RUN_PREFIX}{i:04d}"
             ops_dict[name] = [*base_ops, *ops_list]
 
         return ops_dict
 
-    def make_run_models(self, *, ops_dict: dict[str, list[Any]],
-                        absolute_dirpath: bool) -> list[Run]:
+    def make_run_models(
+        self, *, ops_dict: dict[str, list[Any]], absolute_dirpath: bool
+    ) -> list[Run]:
         """Take list of operations and create run models."""
         run_models = []
 
@@ -111,11 +108,13 @@ class CreateManager:
                 options=self.options.data,
             )
 
-            model = Run(dirname=dirname,
-                        shortname=name,
-                        data_in=data_in,
-                        data_out=data_out,
-                        operations=operations)
+            model = Run(
+                dirname=dirname,
+                shortname=name,
+                data_in=data_in,
+                data_out=data_out,
+                operations=operations,
+            )
 
             run_models.append(model)
 
@@ -124,8 +123,10 @@ class CreateManager:
     def runs_yaml_exists(self) -> bool:
         """Check if runs.yaml exists."""
         if self.runs_yaml.exists():
-            op_queue.add_no_op(description='Not creating runs.yaml',
-                               extra_description=f'{self.runs_yaml} exists')
+            op_queue.add_no_op(
+                description="Not creating runs.yaml",
+                extra_description=f"{self.runs_yaml} exists",
+            )
             return True
         return False
 
@@ -134,12 +135,12 @@ class CreateManager:
         any_exists = False
 
         for model in models:
-            if ImasHandle.model_validate(model.data_in,
-                                         from_attributes=True).exists():
-                logger.info('Target %s already exists', model.data_in)
+            if ImasHandle.model_validate(model.data_in, from_attributes=True).exists():
+                logger.info("Target %s already exists", model.data_in)
                 op_queue.add_no_op(
-                    description='Not creating IDS',
-                    extra_description=f'IDS entry {model.data_in} exists')
+                    description="Not creating IDS",
+                    extra_description=f"IDS entry {model.data_in} exists",
+                )
                 any_exists = True
 
         return any_exists
@@ -151,8 +152,8 @@ class CreateManager:
         for model in models:
             if model.dirname.exists():
                 op_queue.add_no_op(
-                    description='Not creating directory',
-                    extra_description=f'Directory {model.dirname} exists',
+                    description="Not creating directory",
+                    extra_description=f"Directory {model.dirname} exists",
                 )
 
                 any_exists = True
@@ -161,42 +162,42 @@ class CreateManager:
 
     def warn_no_create_runs(self):
         """Add warning to op queue if runs will not be created."""
-        op_queue.warning(description='Warning',
-                         extra_description='Some targets already exist, '
-                         'use --force to override')
+        op_queue.warning(
+            description="Warning",
+            extra_description="Some targets already exist, " "use --force to override",
+        )
 
-    @add_to_op_queue('Setting inital condition of', '{data_in}', quiet=True)
-    def apply_operations(self, data_in: ImasHandle, run_dir: Path,
-                         operations: list[Any]):
+    @add_to_op_queue("Setting inital condition of", "{data_in}", quiet=True)
+    def apply_operations(
+        self, data_in: ImasHandle, run_dir: Path, operations: list[Any]
+    ):
         for model in operations:
-            apply_model(model,
-                        run_dir=run_dir,
-                        ids_mapping=data_in,
-                        system=self.system)
+            apply_model(model, run_dir=run_dir, ids_mapping=data_in, system=self.system)
 
-    @add_to_op_queue('Writing runs', '{self.runs_yaml}', quiet=True)
+    @add_to_op_queue("Writing runs", "{self.runs_yaml}", quiet=True)
     def write_runs_file(self, runs: Sequence[Run]) -> None:
         runs = Runs.model_validate(runs, from_attributes=True)
 
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
+            warnings.simplefilter("ignore")
             to_yaml_file(self.runs_yaml, runs)
 
             # Only if it is a different directory
             if self._is_runs_dir_different_from_config_dir():
-                to_yaml_file(self.runs_dir / 'runs.yaml', runs)
+                to_yaml_file(self.runs_dir / "runs.yaml", runs)
 
-    @add_to_op_queue('Writing csv', quiet=True)
+    @add_to_op_queue("Writing csv", quiet=True)
     def write_runs_csv(self, runs: Sequence[Run]):
         fname = self.data_csv
 
-        prefix = f'{self.cfg.tag}.' if self.cfg.tag else ''
+        prefix = f"{self.cfg.tag}." if self.cfg.tag else ""
 
         run_map = {
-            f'{prefix}{run.shortname}': run.data_out.model_dump()
-            for run in runs if run.data_out
+            f"{prefix}{run.shortname}": run.data_out.model_dump()
+            for run in runs
+            if run.data_out
         }
-        df = pd.DataFrame.from_dict(run_map, orient='index')
+        df = pd.DataFrame.from_dict(run_map, orient="index")
         df.to_csv(fname)
 
         if self._is_runs_dir_different_from_config_dir():
@@ -211,9 +212,9 @@ class CreateManager:
                 action=shutil.copyfile,
                 args=(
                     Path.cwd() / self.cfg._path,
-                    self.runs_dir / 'duqtools.yaml',
+                    self.runs_dir / "duqtools.yaml",
                 ),
-                description='Copying config to run directory',
+                description="Copying config to run directory",
                 quiet=True,
             )
 
@@ -224,16 +225,16 @@ class CreateManager:
 
     def create_run(self, model: Run, *, force: bool = False):
         """Take a run model and create it."""
-        op_queue.add(action=model.dirname.mkdir,
-                     kwargs={
-                         'parents': True,
-                         'exist_ok': force
-                     },
-                     description='Creating run',
-                     extra_description=f'{model.dirname}')
+        op_queue.add(
+            action=model.dirname.mkdir,
+            kwargs={"parents": True, "exist_ok": force},
+            description="Creating run",
+            extra_description=f"{model.dirname}",
+        )
 
         self.source.copy_data_to(
-            ImasHandle.model_validate(model.data_in, from_attributes=True))
+            ImasHandle.model_validate(model.data_in, from_attributes=True)
+        )
 
         if self.template_drc:
             self.system.copy_from_template(self.template_drc, model.dirname)
@@ -243,21 +244,24 @@ class CreateManager:
         self.system.write_batchfile(model.dirname)
 
         if model.data_in and model.data_out:
-            self.system.update_imas_locations(run=model.dirname,
-                                              inp=model.data_in,
-                                              out=model.data_out,
-                                              template_drc=self.template_drc)
+            self.system.update_imas_locations(
+                run=model.dirname,
+                inp=model.data_in,
+                out=model.data_out,
+                template_drc=self.template_drc,
+            )
         else:
-            raise Exception(
-                'data not present in model, this should not happen')
+            raise Exception("data not present in model, this should not happen")
 
 
-def create(*,
-           cfg: Config,
-           force: bool = False,
-           no_sampling: bool = False,
-           absolute_dirpath: bool = False,
-           **kwargs) -> list[Run]:
+def create(
+    *,
+    cfg: Config,
+    force: bool = False,
+    no_sampling: bool = False,
+    absolute_dirpath: bool = False,
+    **kwargs,
+) -> list[Run]:
     """Create input for jetto and IDS data structures.
 
     Parameters
@@ -282,12 +286,13 @@ def create(*,
     )
 
     if not force:
-
-        target_exists = any([
-            create_mgr.runs_yaml_exists(),
-            create_mgr.data_locations_exist(runs),
-            create_mgr.run_dirs_exist(runs),
-        ])
+        target_exists = any(
+            [
+                create_mgr.runs_yaml_exists(),
+                create_mgr.data_locations_exist(runs),
+                create_mgr.run_dirs_exist(runs),
+            ]
+        )
 
         if target_exists:
             create_mgr.warn_no_create_runs()
@@ -309,12 +314,9 @@ def create_api(config: dict, **kwargs) -> dict[str, tuple[Job, Run]]:
     runs = create(cfg=cfg, **kwargs)
 
     if len(runs) == 0:
-        raise CreateError('No runs were created, check logs for errors.')
+        raise CreateError("No runs were created, check logs for errors.")
 
-    return {
-        str(run.shortname): (Job(run.dirname, cfg=cfg), run)
-        for run in runs
-    }
+    return {str(run.shortname): (Job(run.dirname, cfg=cfg), run) for run in runs}
 
 
 def recreate(*, cfg: Config, runs: Sequence[Path], **kwargs):
@@ -336,15 +338,13 @@ def recreate(*, cfg: Config, runs: Sequence[Path], **kwargs):
     run_models = []
     for run in runs:
         if run not in run_dict:
-            raise ValueError(f'`{run}` not in `runs.yaml`.')
+            raise ValueError(f"`{run}` not in `runs.yaml`.")
 
         model = run_dict[run]
-        model.data_in = ImasHandle.model_validate(model.data_in,
-                                                  from_attributes=True)
+        model.data_in = ImasHandle.model_validate(model.data_in, from_attributes=True)
         assert model.data_in
 
-        model.data_out = ImasHandle.model_validate(model.data_out,
-                                                   from_attributes=True)
+        model.data_out = ImasHandle.model_validate(model.data_out, from_attributes=True)
         assert model.data_out
 
         model.data_in.delete()
@@ -358,16 +358,14 @@ def recreate(*, cfg: Config, runs: Sequence[Path], **kwargs):
     return run_models
 
 
-def recreate_api(config: dict, runs: Sequence[Path],
-                 **kwargs) -> dict[str, tuple[Job, Run]]:
+def recreate_api(
+    config: dict, runs: Sequence[Path], **kwargs
+) -> dict[str, tuple[Job, Run]]:
     """Wrapper around create for python api."""
     cfg = Config.from_dict(config)
     runs = recreate(cfg=cfg, runs=runs, **kwargs)
 
     if len(runs) == 0:
-        raise CreateError('No runs were recreated, check logs for errors.')
+        raise CreateError("No runs were recreated, check logs for errors.")
 
-    return {
-        str(run.shortname): (Job(run.dirname, cfg=cfg), run)
-        for run in runs
-    }
+    return {str(run.shortname): (Job(run.dirname, cfg=cfg), run) for run in runs}

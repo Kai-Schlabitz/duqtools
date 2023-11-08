@@ -23,7 +23,6 @@ from ._schema_root import ConfigModel
 
 
 class Config(ConfigModel):
-
     @staticmethod
     def _update_global_config(cfg: Config):
         from ._variables import var_lookup

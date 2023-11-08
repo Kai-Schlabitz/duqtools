@@ -27,7 +27,7 @@ def apply_model(
     NotImplementedError
         When the model is unknown
     """
-    raise NotImplementedError(f'Unknown model: {model}')
+    raise NotImplementedError(f"Unknown model: {model}")
 
 
 @apply_model.register

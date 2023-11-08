@@ -32,15 +32,23 @@ class DataLocation(BaseModel):
     """
 
     user: Optional[str] = Field(
-        description='Username for the IMAS database to use,'
-        ' defaults to current user')
+        description="Username for the IMAS database to use," " defaults to current user"
+    )
 
-    imasdb: str = Field(description='IMAS database or machine name.')
+    imasdb: str = Field(description="IMAS database or machine name.")
 
-    run_in_start_at: int = Field(description=f("""
+    run_in_start_at: int = Field(
+        description=f(
+            """
             The sequence of input data files start with this run number.
-            """))
+            """
+        )
+    )
 
-    run_out_start_at: int = Field(description=f("""
+    run_out_start_at: int = Field(
+        description=f(
+            """
             The sequence of output data files start with this run number.
-            """))
+            """
+        )
+    )

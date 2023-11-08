@@ -30,9 +30,9 @@ def remove_run(model: Run):
     if Path(model.dirname).exists():
         op_queue.add(
             action=shutil.rmtree,
-            args=(model.dirname, ),
-            description='Removing run dir',
-            extra_description=f'{model.dirname}',
+            args=(model.dirname,),
+            description="Removing run dir",
+            extra_description=f"{model.dirname}",
         )
 
 
@@ -57,37 +57,36 @@ def cleanup(*, cfg: Config, out: bool, force: bool, **kwargs):
     else:
         if locations.runs_yaml.exists() and not force:
             if locations.runs_yaml_old.exists():
-                raise OSError(
-                    '`runs.yaml.old` exists, use --force to overwrite anyway')
+                raise OSError("`runs.yaml.old` exists, use --force to overwrite anyway")
 
     for run in runs:
         data_in = ImasHandle.model_validate(run.data_in, from_attributes=True)
-        data_out = ImasHandle.model_validate(run.data_out,
-                                             from_attributes=True)
+        data_out = ImasHandle.model_validate(run.data_out, from_attributes=True)
 
         data_in.delete()
 
         if out:
             data_out.delete()
         else:
-            op_queue.add_no_op(description='NOT Removing',
-                               extra_description=f'{data_out}')
+            op_queue.add_no_op(
+                description="NOT Removing", extra_description=f"{data_out}"
+            )
 
         remove_run(run)
 
     op_queue.add(
         action=shutil.move,
         args=(locations.runs_yaml, locations.runs_yaml_old),
-        description='Moving runs.yaml',
-        extra_description=f'{locations.runs_yaml_old}',
+        description="Moving runs.yaml",
+        extra_description=f"{locations.runs_yaml_old}",
     )
 
     op_queue.add(
         action=remove_files,
         args=(
-            'duqtools_slurm_array.err',
-            'duqtools_slurm_array.out',
-            'duqtools_slurm_array.sh',
+            "duqtools_slurm_array.err",
+            "duqtools_slurm_array.out",
+            "duqtools_slurm_array.sh",
         ),
-        description='Removing other files',
+        description="Removing other files",
     )

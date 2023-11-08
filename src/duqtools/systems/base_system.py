@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractSystem(ABC):
-
     def __init__(self, cfg: Config):
         self.cfg = cfg
         self.options = cfg.system

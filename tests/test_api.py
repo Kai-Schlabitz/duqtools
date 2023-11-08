@@ -9,55 +9,47 @@ import pytest
 
 from duqtools.api import create, get_status, recreate, submit
 
-imas = pytest.importorskip('imas',
-                           reason='No way of testing this without IMAS')
+imas = pytest.importorskip("imas", reason="No way of testing this without IMAS")
 
-TEMPLATE_MODEL = Path(
-    __file__).parent.resolve() / 'test_data' / 'template_model'
-CONTAINERIZED_RUNS_DIR = os.environ['CONTAINERIZED_RUNS_DIR']
-IMASDB = Path(CONTAINERIZED_RUNS_DIR).resolve() / 'imasdb'
+TEMPLATE_MODEL = Path(__file__).parent.resolve() / "test_data" / "template_model"
+CONTAINERIZED_RUNS_DIR = os.environ["CONTAINERIZED_RUNS_DIR"]
+IMASDB = Path(CONTAINERIZED_RUNS_DIR).resolve() / "imasdb"
 
 config = {
-    'tag': 'data_01',
-    'create': {
-        'runs_dir':
-        None,
-        'template':
-        str(TEMPLATE_MODEL),
-        'template_data': {
-            'user': str(IMASDB),
-            'db': 'jet',
-            'shot': 123,
-            'run': 1,
+    "tag": "data_01",
+    "create": {
+        "runs_dir": None,
+        "template": str(TEMPLATE_MODEL),
+        "template_data": {
+            "user": str(IMASDB),
+            "db": "jet",
+            "shot": 123,
+            "run": 1,
         },
-        'operations': [
+        "operations": [
             {
-                'variable': 'major_radius',
-                'operator': 'copyto',
-                'value': 123.0,
+                "variable": "major_radius",
+                "operator": "copyto",
+                "value": 123.0,
             },
         ],
-        'dimensions': [
-            {
-                'variable': 't_e',
-                'operator': 'multiply',
-                'values': [0.8, 1.0, 1.2]
-            },
+        "dimensions": [
+            {"variable": "t_e", "operator": "multiply", "values": [0.8, 1.0, 1.2]},
         ],
     },
-    'system': {
-        'name': 'jetto',
-        'submit_command': 'true',
+    "system": {
+        "name": "jetto",
+        "submit_command": "true",
     },
 }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def tmpworkdir():
-    jruns = os.environ.get('JRUNS', '.')
+    jruns = os.environ.get("JRUNS", ".")
 
     with tempfile.TemporaryDirectory(dir=jruns) as workdir:
-        config['create']['runs_dir'] = workdir
+        config["create"]["runs_dir"] = workdir
         yield workdir
 
 
@@ -73,9 +65,9 @@ def test_create(tmpworkdir):
         assert run.data_in.exists()
 
 
-@pytest.mark.dependency(depends=['test_create'])
+@pytest.mark.dependency(depends=["test_create"])
 def test_recreate(tmpworkdir):
-    dirname = 'run_0000'
+    dirname = "run_0000"
 
     run_path = Path(tmpworkdir, dirname)
 
@@ -92,9 +84,9 @@ def test_recreate(tmpworkdir):
     assert run.data_in.exists()
 
 
-@pytest.mark.dependency(depends=['test_recreate'])
+@pytest.mark.dependency(depends=["test_recreate"])
 def test_submit(tmpworkdir):
-    for path in Path(tmpworkdir).glob('run_*/duqtools.submit.lock'):
+    for path in Path(tmpworkdir).glob("run_*/duqtools.submit.lock"):
         path.unlink()
 
     job_queue = submit(config, parent_dir=Path(tmpworkdir))
@@ -105,12 +97,12 @@ def test_submit(tmpworkdir):
         assert job.lockfile.exists()
 
 
-@pytest.mark.dependency(depends=['test_submit'])
+@pytest.mark.dependency(depends=["test_submit"])
 def test_resubmit(tmpworkdir):
-    path = Path(tmpworkdir, 'run_0000', 'duqtools.submit.lock')
+    path = Path(tmpworkdir, "run_0000", "duqtools.submit.lock")
     path.unlink()
 
-    resubmit = (Path(tmpworkdir, 'run_0000'), )
+    resubmit = (Path(tmpworkdir, "run_0000"),)
 
     job_queue = submit(config, resubmit=resubmit, parent_dir=Path(tmpworkdir))
 
@@ -120,33 +112,36 @@ def test_resubmit(tmpworkdir):
         assert job.lockfile.exists()
 
 
-@pytest.mark.dependency(depends=['test_recreate'])
+@pytest.mark.dependency(depends=["test_recreate"])
 def test_submit_array(tmpworkdir):
     submit(config, array=True, parent_dir=Path(tmpworkdir), force=True)
 
-    assert Path('duqtools_slurm_array.sh').exists()
+    assert Path("duqtools_slurm_array.sh").exists()
 
 
-@pytest.mark.dependency(depends=['test_recreate'])
+@pytest.mark.dependency(depends=["test_recreate"])
 def test_status():
     tracker = get_status(config)
     assert len(tracker.jobs) == 3
 
 
 def test_example_plot():
-    pytest.xfail('`duqtools plot` is not compatible with local imasdb, '
-                 'so we have no way of testing this currently')
+    pytest.xfail(
+        "`duqtools plot` is not compatible with local imasdb, "
+        "so we have no way of testing this currently"
+    )
 
     import subprocess as sp
 
     from duqtools.ids import imas_mocked
     from duqtools.utils import work_directory
+
     if imas_mocked:
-        pytest.xfail('Imas needed for plotting Imas data')
+        pytest.xfail("Imas needed for plotting Imas data")
 
-    cmd = ('duqtools plot -h public/jet/123/1 -v zeff').split()
+    cmd = ("duqtools plot -h public/jet/123/1 -v zeff").split()
 
-    with work_directory('.'):
+    with work_directory("."):
         result = sp.run(cmd)
-        assert (result.returncode == 0)
-        assert (Path('./chart_rho_tor_norm-zeff.html').exists())
+        assert result.returncode == 0
+        assert Path("./chart_rho_tor_norm-zeff.html").exists()

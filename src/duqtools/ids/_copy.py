@@ -23,18 +23,18 @@ def get_imas_ual_version():
     - `imas_3_34_0_ual_4_9_3`
     - `imas_3_38_0_dev1_ual_4_11_0`
     """
-    vsplit = imas.names[0].split('_')
+    vsplit = imas.names[0].split("_")
 
-    ual_start = vsplit.index('ual')
-    imas_start = vsplit.index('imas')
+    ual_start = vsplit.index("ual")
+    imas_start = vsplit.index("imas")
 
-    imas_version = version.parse('.'.join(vsplit[imas_start + 1:ual_start]))
-    ual_version = version.parse('.'.join(vsplit[ual_start + 1:]))
+    imas_version = version.parse(".".join(vsplit[imas_start + 1 : ual_start]))
+    ual_version = version.parse(".".join(vsplit[ual_start + 1 :]))
 
     return imas_version, ual_version
 
 
-def add_provenance_info(handle: ImasHandle, ids: str = 'core_profiles'):
+def add_provenance_info(handle: ImasHandle, ids: str = "core_profiles"):
     """Add provenance information to handle.
 
     Parameters
@@ -52,25 +52,24 @@ def add_provenance_info(handle: ImasHandle, ids: str = 'core_profiles'):
         entry = data_entry_target.get(ids)
 
         # Set the name
-        entry.code.name = 'duqtools'
+        entry.code.name = "duqtools"
 
         # Get the commit if we are in a repository
         try:
             entry.code.commit = git.Repo(
-                Path(__file__).parent,
-                search_parent_directories=True).head.object.hexsha
+                Path(__file__).parent, search_parent_directories=True
+            ).head.object.hexsha
         except Exception:
-            entry.code.commit = 'unknown'
+            entry.code.commit = "unknown"
 
         # Set the version if available
         try:
-            entry.code.version = pkg_resources.get_distribution(
-                'duqtools').version
+            entry.code.version = pkg_resources.get_distribution("duqtools").version
         except Exception:
-            entry.code.version = 'unknown'
+            entry.code.version = "unknown"
 
         # The repository, always set to duqtools
-        entry.code.repository = 'https://github.com/duqtools/duqtools/'
+        entry.code.repository = "https://github.com/duqtools/duqtools/"
 
         entry.put(db_entry=data_entry_target)
 
@@ -99,7 +98,7 @@ def copy_ids_entry_complex(source: ImasHandle, target: ImasHandle):
 
     ids_not_found = op[0] < 0
     if ids_not_found:
-        raise KeyError('The entry you are trying to copy does not exist')
+        raise KeyError("The entry you are trying to copy does not exist")
 
     idss_out = imas.ids(target.shot, target.run)  # type: ignore
 
@@ -110,12 +109,11 @@ def copy_ids_entry_complex(source: ImasHandle, target: ImasHandle):
 
     # Temporarily hide warnings, because this loop is very spammy
     with LoggingContext(level=logging.CRITICAL):
-
         for ids_info in parser.idss:
-            name = ids_info['name']
-            maxoccur = int(ids_info['maxoccur'])
+            name = ids_info["name"]
+            maxoccur = int(ids_info["maxoccur"])
 
-            if name in ('ec_launchers', 'numerics', 'sdn'):
+            if name in ("ec_launchers", "numerics", "sdn"):
                 continue
 
             for i in range(maxoccur + 1):
@@ -128,7 +126,7 @@ def copy_ids_entry_complex(source: ImasHandle, target: ImasHandle):
     idss_out.close()
 
 
-@add_to_op_queue('Copy ids from template to', '{target}', quiet=True)
+@add_to_op_queue("Copy ids from template to", "{target}", quiet=True)
 def copy_ids_entry(source: ImasHandle, target: ImasHandle):
     """Copies the ids entry to a new location.
 
@@ -146,7 +144,7 @@ def copy_ids_entry(source: ImasHandle, target: ImasHandle):
     """
     target.validate()
 
-    if os.environ.get('SIMPLE_IDS_COPY'):
+    if os.environ.get("SIMPLE_IDS_COPY"):
         for src_file, dst_file in zip(source.paths(), target.paths()):
             shutil.copyfile(src_file, dst_file)
     else:

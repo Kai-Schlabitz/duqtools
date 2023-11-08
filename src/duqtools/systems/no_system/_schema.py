@@ -8,4 +8,4 @@ from ..models import SystemModel
 
 
 class NoSystemModel(SystemModel):
-    name: Literal[None, 'nosystem'] = Field(None, description='No system.')
+    name: Literal[None, "nosystem"] = Field(None, description="No system.")

@@ -11,29 +11,29 @@ from duqtools.systems.jetto import IDS2JettoVariableModel
 
 @pytest.fixture
 def var():
-
     class t0:
         time = np.array((10, 20, 30))
 
     class t1:
         time = np.array((40, 50, 60))
 
-    handle = {'t0': IDSMapping(t0), 't1': IDSMapping(t1)}
+    handle = {"t0": IDSMapping(t0), "t1": IDSMapping(t1)}
 
     return Variables(handle=handle)
 
 
 def test_pick_first(var):
     lookup = {
-        'ids-t_start':
-        parse_yaml_raw_as(
-            IDS2JettoVariableModel, """
+        "ids-t_start": parse_yaml_raw_as(
+            IDS2JettoVariableModel,
+            """
     name: ids-t_start
     type: IDS2jetto-variable
     paths:
       - {ids: t0, path: time/0}
       - {ids: t1, path: time/1}
-    """)
+    """,
+        )
     }
 
     var.lookup = lookup
@@ -42,15 +42,16 @@ def test_pick_first(var):
 
 def test_pick_second(var):
     lookup = {
-        'ids-t_start':
-        parse_yaml_raw_as(
-            IDS2JettoVariableModel, """
+        "ids-t_start": parse_yaml_raw_as(
+            IDS2JettoVariableModel,
+            """
     name: ids-t_start
     type: IDS2jetto-variable
     paths:
       - {ids: t0, path: does-not-exist/0}
       - {ids: t1, path: time/1}
-    """)
+    """,
+        )
     }
 
     var.lookup = lookup
@@ -59,15 +60,16 @@ def test_pick_second(var):
 
 def test_default(var):
     lookup = {
-        'ids-t_start':
-        parse_yaml_raw_as(
-            IDS2JettoVariableModel, """
+        "ids-t_start": parse_yaml_raw_as(
+            IDS2JettoVariableModel,
+            """
     name: ids-t_start
     type: IDS2jetto-variable
     paths:
       - {ids: t0, path: does-not-exist/0}
     default: 1337
-    """)
+    """,
+        )
     }
 
     var.lookup = lookup
@@ -76,14 +78,15 @@ def test_default(var):
 
 def test_raise(var):
     lookup = {
-        'ids-t_start':
-        parse_yaml_raw_as(
-            IDS2JettoVariableModel, """
+        "ids-t_start": parse_yaml_raw_as(
+            IDS2JettoVariableModel,
+            """
     name: ids-t_start
     type: IDS2jetto-variable
     paths:
       - {ids: t0, path: does-not-exist/0}
-    """)
+    """,
+        )
     }
 
     var.lookup = lookup
@@ -93,11 +96,11 @@ def test_raise(var):
 
 
 def test_getattr(var):
-    lookup = {'ids-t_start': None}
+    lookup = {"ids-t_start": None}
 
     var.lookup = lookup
 
-    with pytest.raises(AttributeError, match='does_not_exist'):
+    with pytest.raises(AttributeError, match="does_not_exist"):
         var.does_not_exist
 
     # ensure that default attribute lookup does not fail
@@ -107,15 +110,16 @@ def test_getattr(var):
 
 def test_caching(var):
     lookup = {
-        'ids-t_start':
-        parse_yaml_raw_as(
-            IDS2JettoVariableModel, """
+        "ids-t_start": parse_yaml_raw_as(
+            IDS2JettoVariableModel,
+            """
     name: ids-t_start
     type: IDS2jetto-variable
     paths:
       - {ids: t0, path: time/0}
       - {ids: t1, path: time/1}
-    """)
+    """,
+        )
     }
 
     var.lookup = lookup
@@ -123,5 +127,5 @@ def test_caching(var):
 
     var.t_start
 
-    assert 't0' in var._ids_cache
-    assert 't1' not in var._ids_cache
+    assert "t0" in var._ids_cache
+    assert "t1" not in var._ids_cache

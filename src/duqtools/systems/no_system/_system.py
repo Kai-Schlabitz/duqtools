@@ -20,6 +20,7 @@ class NoSystem(V220922Mixin, AbstractSystem):
       name: 'nosystem'  # or `name: None`
     ```
     """
+
     model: NoSystemModel
 
     @property
@@ -31,7 +32,7 @@ class NoSystem(V220922Mixin, AbstractSystem):
         -------
         Path
         """
-        if jruns_env := os.getenv('JRUNS'):
+        if jruns_env := os.getenv("JRUNS"):
             return Path(jruns_env)
         else:
             return Path()
@@ -54,7 +55,7 @@ class NoSystem(V220922Mixin, AbstractSystem):
 
         count = 0
         while True:  # find the next free folder
-            dirname = f'duqtools_data_{count:04d}'
+            dirname = f"duqtools_data_{count:04d}"
             if not (path / dirname).exists():
                 break
             count = count + 1

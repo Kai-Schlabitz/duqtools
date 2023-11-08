@@ -21,23 +21,23 @@ else:
 
 logger = logging.getLogger(__name__)
 
-VAR_ENV = 'DUQTOOLS_VARDEF'
-USER_CONFIG_HOME = Path.home() / '.config'
-LOCAL_DIR = Path('.').absolute()
-DUQTOOLS_DIR = 'duqtools'
-VAR_FILENAME = 'variables.yaml'
-VAR_FILENAME_GLOB = 'variables*.yaml'
-ERROR_SUFFIX = '_error_upper'
+VAR_ENV = "DUQTOOLS_VARDEF"
+USER_CONFIG_HOME = Path.home() / ".config"
+LOCAL_DIR = Path(".").absolute()
+DUQTOOLS_DIR = "duqtools"
+VAR_FILENAME = "variables.yaml"
+VAR_FILENAME_GLOB = "variables*.yaml"
+ERROR_SUFFIX = "_error_upper"
 
 
 class VarLookup(UserDict):
-    _prefix = '$'
+    _prefix = "$"
     """Variable lookup table.
 
     Subclasses `UserDict` to embed some commonly used operations, like
     grouping and filtering.
     """
-    _ids_variable_key = 'IDS-variable'
+    _ids_variable_key = "IDS-variable"
 
     def __getitem__(self, key: str) -> IDSVariableModel:
         return self.data[self.normalize(key)]
@@ -84,7 +84,6 @@ class VarLookup(UserDict):
 
 
 class VariableConfigLoader:
-
     def __init__(self):
         self.paths = self.get_config_path()
 
@@ -93,7 +92,7 @@ class VariableConfigLoader:
         var_lookup = VarLookup()
 
         for path in self.paths:
-            logger.debug(f'Loading variables from: {path}')
+            logger.debug(f"Loading variables from: {path}")
             with open(path) as f:
                 var_config = parse_yaml_raw_as(VariableConfigModel, f)
             var_lookup.update(var_config.to_variable_dict())
@@ -110,9 +109,9 @@ class VariableConfigLoader:
         4. fall back to variable definitions in package
         """
         for paths in (
-                self._get_paths_from_environment_variable(),
-                self._get_paths_from_config_home(),
-                self._get_paths_local_directory(),
+            self._get_paths_from_environment_variable(),
+            self._get_paths_from_config_home(),
+            self._get_paths_local_directory(),
         ):
             if paths:
                 return paths
@@ -126,7 +125,7 @@ class VariableConfigLoader:
             drc = path.parent
 
             if not drc.exists():
-                raise OSError(f'{path} defined by ${VAR_ENV} does not exist!')
+                raise OSError(f"{path} defined by ${VAR_ENV} does not exist!")
 
             return tuple(drc.glob(path.name))
 
@@ -136,7 +135,7 @@ class VariableConfigLoader:
         return None  # Not implemented
 
     def _get_paths_from_config_home(self) -> tuple[Path, ...] | None:
-        config_home = os.environ.get('XDG_CONFIG_HOME', USER_CONFIG_HOME)
+        config_home = os.environ.get("XDG_CONFIG_HOME", USER_CONFIG_HOME)
 
         drc = Path(config_home) / DUQTOOLS_DIR
         if drc.exists():
@@ -145,14 +144,14 @@ class VariableConfigLoader:
         return None
 
     def _get_paths_fallback(self) -> tuple[Path, ...]:
-        module = files('duqtools.data')
+        module = files("duqtools.data")
         assert module.is_dir()
         drc: PosixPath = module._paths[0]  # type: ignore
         return tuple(drc.glob(VAR_FILENAME_GLOB))
 
 
 def lookup_vars(
-        variables: Sequence[(str | IDSVariableModel)]
+    variables: Sequence[(str | IDSVariableModel)],
 ) -> list[IDSVariableModel]:
     """Helper function to look up a bunch of variables.
 
@@ -167,7 +166,7 @@ def lookup_vars(
             else:
                 var = var_lookup[var]
         if not isinstance(var, IDSVariableModel):
-            raise ValueError(f'Cannot lookup variable with type {type(var)}')
+            raise ValueError(f"Cannot lookup variable with type {type(var)}")
         var_models.append(var)
     return var_models
 

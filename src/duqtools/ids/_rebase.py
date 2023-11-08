@@ -24,7 +24,7 @@ def rezero_time(ds: xr.Dataset, *, start: int = 0) -> None:
     start : int, optional
         Where to start the returned time series
     """
-    ds['time'] = ds['time'] - ds['time'][0] + start
+    ds["time"] = ds["time"] - ds["time"][0] + start
 
 
 def squash_placeholders(ds: xr.Dataset) -> xr.Dataset:
@@ -44,7 +44,7 @@ def squash_placeholders(ds: xr.Dataset) -> xr.Dataset:
     ds : xr.Dataset
         xarray Dataset
     """
-    prefix = '$'
+    prefix = "$"
 
     dimensions = tuple(str(dim) for dim in ds.dims)
 
@@ -63,12 +63,14 @@ def squash_placeholders(ds: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def standardize_grid(ds: xr.Dataset,
-                     *,
-                     new_dim: str,
-                     old_dim: str,
-                     group: Optional[str] = None,
-                     new_dim_data: Union[np.ndarray, int] = 0) -> xr.Dataset:
+def standardize_grid(
+    ds: xr.Dataset,
+    *,
+    new_dim: str,
+    old_dim: str,
+    group: Optional[str] = None,
+    new_dim_data: Union[np.ndarray, int] = 0,
+) -> xr.Dataset:
     """Standardize the grid within a dataset.
 
     Perform `split-apply-combine` routine on the data. Split
@@ -96,8 +98,9 @@ def standardize_grid(ds: xr.Dataset,
         New dataset with `new_dim` as a coordinate dimension.
     """
     if isinstance(new_dim_data, int):
-        new_dim_data = ds.isel(  # type: ignore
-            **{group: new_dim_data})[new_dim].data  # type:ignore
+        new_dim_data = ds.isel(**{group: new_dim_data})[  # type: ignore
+            new_dim
+        ].data  # type:ignore
 
     gb = ds.groupby(group)
 
@@ -111,8 +114,9 @@ def standardize_grid(ds: xr.Dataset,
     return gb.map(standardize)
 
 
-def rebase_on_grid(ds: xr.Dataset, *, coord_dim: str,
-                   new_coords: np.ndarray) -> xr.Dataset:
+def rebase_on_grid(
+    ds: xr.Dataset, *, coord_dim: str, new_coords: np.ndarray
+) -> xr.Dataset:
     """Rebase (interpolate) the coordinate dimension to the new coordinates.
 
     Thin wrapper around `xarray.Dataset.interp`.
@@ -131,14 +135,14 @@ def rebase_on_grid(ds: xr.Dataset, *, coord_dim: str,
     xr.Dataset
         Rebased dataset
     """
-    return ds.interp(coords={coord_dim: new_coords},
-                     kwargs={'fill_value': 'extrapolate'})
+    return ds.interp(
+        coords={coord_dim: new_coords}, kwargs={"fill_value": "extrapolate"}
+    )
 
 
-def rebase_on_time(ds: xr.Dataset,
-                   *,
-                   time_dim='time',
-                   new_coords: np.ndarray) -> xr.Dataset:
+def rebase_on_time(
+    ds: xr.Dataset, *, time_dim="time", new_coords: np.ndarray
+) -> xr.Dataset:
     """Rebase (interpolate) the time dimension to the new coordinates.
 
     Thin wrapper around `xarray.Dataset.interp`.
@@ -167,8 +171,8 @@ def rebase_on_time(ds: xr.Dataset,
 def standardize_grid_and_time(
     datasets: Sequence[xr.Dataset],
     *,
-    grid_var: str = 'rho_tor_norm',
-    time_var: str = 'time',
+    grid_var: str = "rho_tor_norm",
+    time_var: str = "time",
     reference_dataset: int = 0,
 ) -> tuple[xr.Dataset, ...]:
     """Standardize list of datasets by applying standard rebase operations.
@@ -201,13 +205,15 @@ def standardize_grid_and_time(
 
     datasets = tuple(
         rebase_on_grid(ds, coord_dim=grid_var, new_coords=reference_grid)
-        for ds in datasets)
+        for ds in datasets
+    )
 
     reference_time = datasets[reference_dataset][time_var].data
 
     datasets = tuple(
         rebase_on_time(ds, time_dim=time_var, new_coords=reference_time)
-        for ds in datasets)
+        for ds in datasets
+    )
 
     return datasets
 
@@ -231,10 +237,10 @@ def rebase_all_coords(
     """
 
     interp_dict = {
-        name: dim
-        for name, dim in reference_dataset.coords.items() if dim.size > 1
+        name: dim for name, dim in reference_dataset.coords.items() if dim.size > 1
     }
 
     return tuple(
-        ds.interp(coords=interp_dict, kwargs={'fill_value': 'extrapolate'})
-        for ds in datasets)
+        ds.interp(coords=interp_dict, kwargs={"fill_value": "extrapolate"})
+        for ds in datasets
+    )

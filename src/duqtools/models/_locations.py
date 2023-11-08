@@ -19,10 +19,9 @@ class Locations:
     known config directory.
     """
 
-    def __init__(self,
-                 *,
-                 parent_dir: Optional[Path] = None,
-                 cfg: Optional[Config] = None):
+    def __init__(
+        self, *, parent_dir: Optional[Path] = None, cfg: Optional[Config] = None
+    ):
         if not parent_dir:
             parent_dir = Path.cwd()
 
@@ -32,17 +31,17 @@ class Locations:
     @property
     def data_csv(self):
         """Location of data.csv."""
-        return self.parent_dir / 'data.csv'
+        return self.parent_dir / "data.csv"
 
     @property
     def runs_yaml(self):
         """Location of runs.yaml."""
-        return self.parent_dir / 'runs.yaml'
+        return self.parent_dir / "runs.yaml"
 
     @property
     def runs_yaml_old(self):
         """Location of runs.yaml.old."""
-        return self.parent_dir / 'runs.yaml.old'
+        return self.parent_dir / "runs.yaml.old"
 
     @property
     def runs(self) -> list[Run]:
@@ -50,7 +49,7 @@ class Locations:
         runs_yaml = self.runs_yaml
 
         if not runs_yaml.exists():
-            raise OSError(f'Cannot find {runs_yaml}.')
+            raise OSError(f"Cannot find {runs_yaml}.")
 
         with open(runs_yaml) as f:
             model = parse_yaml_raw_as(Runs, f)

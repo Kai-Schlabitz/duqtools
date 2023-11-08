@@ -17,26 +17,29 @@ info, debug = logger.info, logger.debug
 
 def _resolve_variables(var_names: Sequence[str]) -> list[IDSVariableModel]:
     """Looks up variables if specified, if empty return all variables."""
-    idsvar_lookup = var_lookup.filter_type('IDS-variable')
+    idsvar_lookup = var_lookup.filter_type("IDS-variable")
 
     if not var_names:
         variables = list(idsvar_lookup.values())
-        op_queue.info(description='Merging all known variables')
+        op_queue.info(description="Merging all known variables")
     else:
         variables = list(idsvar_lookup[name] for name in var_names)
         for variable in variables:
-            op_queue.info(description='Variable for merge',
-                          extra_description=f'{variable.name}')
+            op_queue.info(
+                description="Variable for merge", extra_description=f"{variable.name}"
+            )
 
     return variables
 
 
-def _merge(*,
-           handles: Sequence[ImasHandle],
-           template: ImasHandle,
-           target: ImasHandle,
-           variables: Sequence[IDSVariableModel],
-           force: bool = False):
+def _merge(
+    *,
+    handles: Sequence[ImasHandle],
+    template: ImasHandle,
+    target: ImasHandle,
+    variables: Sequence[IDSVariableModel],
+    force: bool = False,
+):
     """Merge mas data.
 
     Parameters
@@ -53,15 +56,15 @@ def _merge(*,
         Force overwriting existing files.
     """
     for handle in handles:
-        logger.debug('Source for merge %s', handle)
+        logger.debug("Source for merge %s", handle)
 
-    op_queue.info(description='Template for merge',
-                  extra_description=f'{template}')
+    op_queue.info(description="Template for merge", extra_description=f"{template}")
 
     if target.exists() and not force:
-        op_queue.add_no_op(description='Abort merge',
-                           extra_description=f'{target} already exists, '
-                           'use --force to overwrite')
+        op_queue.add_no_op(
+            description="Abort merge",
+            extra_description=f"{target} already exists, " "use --force to overwrite",
+        )
         return
 
     template.copy_data_to(target)
@@ -69,8 +72,16 @@ def _merge(*,
     merge_data(handles, target, variables)
 
 
-def merge(*, target: str, template: str, handles: list[str],
-          input_files: list[str], var_names: list[str], force: bool, **kwargs):
+def merge(
+    *,
+    target: str,
+    template: str,
+    handles: list[str],
+    input_files: list[str],
+    var_names: list[str],
+    force: bool,
+    **kwargs,
+):
     """Merge as many data as possible."""
     template = ImasHandle.from_string(template)
     target = ImasHandle.from_string(target)

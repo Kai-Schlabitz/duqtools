@@ -16,10 +16,10 @@ from ..operations import add_to_op_queue, op_queue
 logger = logging.getLogger(__name__)
 
 
-@add_to_op_queue('Writing csv', '{fname}')
-def _write_data_csv(handles: dict[str, ImasHandle], fname: str = 'data.csv'):
+@add_to_op_queue("Writing csv", "{fname}")
+def _write_data_csv(handles: dict[str, ImasHandle], fname: str = "data.csv"):
     """Write handles to a data.csv file."""
-    df = pd.DataFrame.from_dict(handles, orient='index')
+    df = pd.DataFrame.from_dict(handles, orient="index")
     df.to_csv(fname)
 
 
@@ -28,7 +28,7 @@ def merge(force: bool, var_names: Sequence[str], **kwargs):
 
     variables = _resolve_variables(var_names)
 
-    config_files = cwd.glob('**/duqtools.yaml')
+    config_files = cwd.glob("**/duqtools.yaml")
 
     target_handles = {}
 
@@ -44,23 +44,23 @@ def merge(force: bool, var_names: Sequence[str], **kwargs):
 
         runs = Locations(parent_dir=config_dir, cfg=cfg).runs
         runs = (run for run in runs if Job(run.dirname, cfg=cfg).is_completed)
-        handles = (ImasHandle.model_validate(run.data_out,
-                                             from_attributes=True)
-                   for run in runs)
+        handles = (
+            ImasHandle.model_validate(run.data_out, from_attributes=True)
+            for run in runs
+        )
         handles = [handle for handle in handles if handle.exists()]
 
         if not handles:
-            op_queue.warning(run_name, 'No data to merge.')
+            op_queue.warning(run_name, "No data to merge.")
             continue
 
-        op_queue.info(run_name,
-                      extra_description=f'Merging {len(handles)} datasets')
+        op_queue.info(run_name, extra_description=f"Merging {len(handles)} datasets")
 
         template_data = handles[0]
 
         target_data = template_data.copy()
-        target_data.user = str(cfg.create.runs_dir / 'imasdb')
-        target_handles[f'{run_name}_merged'] = target_data.model_dump()
+        target_data.user = str(cfg.create.runs_dir / "imasdb")
+        target_handles[f"{run_name}_merged"] = target_data.model_dump()
 
         _merge(
             variables=variables,
@@ -70,4 +70,4 @@ def merge(force: bool, var_names: Sequence[str], **kwargs):
             force=force,
         )
 
-    _write_data_csv(target_handles, fname='merge_data.csv')
+    _write_data_csv(target_handles, fname="merge_data.csv")

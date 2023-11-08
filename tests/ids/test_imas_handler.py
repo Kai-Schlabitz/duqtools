@@ -7,29 +7,29 @@ import pytest
 from duqtools.ids import ImasHandle
 
 TEST_STRINGS = (
-    'gu3ido/m0o/9234/123',
-    'guido4/mo0/9234/123',
-    '123_guido_123/123moo/9234/123',
-    'moo/9234/123',
+    "gu3ido/m0o/9234/123",
+    "guido4/mo0/9234/123",
+    "123_guido_123/123moo/9234/123",
+    "moo/9234/123",
 )
 TEST_OUTPUT = (
-    ('gu3ido', 'm0o', 9234, 123),
-    ('guido4', 'mo0', 9234, 123),
-    ('123_guido_123', '123moo', 9234, 123),
-    (getuser(), 'moo', 9234, 123),
+    ("gu3ido", "m0o", 9234, 123),
+    ("guido4", "mo0", 9234, 123),
+    ("123_guido_123", "123moo", 9234, 123),
+    (getuser(), "moo", 9234, 123),
 )
 
 TEST_STRINGS_localdb = (
-    '/user/directory/jet/1/2',
-    '/a/longer/user/directory/jet/123/456',
+    "/user/directory/jet/1/2",
+    "/a/longer/user/directory/jet/123/456",
 )
 TEST_OUTPUT_localdb = (
-    ('/user/directory', 'jet', 1, 2),
-    ('/a/longer/user/directory', 'jet', 123, 456),
+    ("/user/directory", "jet", 1, 2),
+    ("/a/longer/user/directory", "jet", 123, 456),
 )
 
 
-@pytest.mark.parametrize('string,expected', zip(TEST_STRINGS, TEST_OUTPUT))
+@pytest.mark.parametrize("string,expected", zip(TEST_STRINGS, TEST_OUTPUT))
 def test_from_string(string, expected):
     handle = ImasHandle.from_string(string)
 
@@ -40,8 +40,9 @@ def test_from_string(string, expected):
     assert handle.run == expected[3]
 
 
-@pytest.mark.parametrize('string,expected',
-                         zip(TEST_STRINGS_localdb, TEST_OUTPUT_localdb))
+@pytest.mark.parametrize(
+    "string,expected", zip(TEST_STRINGS_localdb, TEST_OUTPUT_localdb)
+)
 def test_from_string_localdb(string, expected):
     handle = ImasHandle.from_string(string)
 
@@ -54,8 +55,8 @@ def test_from_string_localdb(string, expected):
 
 def test_jintrac_v220922():
     """Test local db implementation."""
-    user = '/some/path/imasdb'
-    h = ImasHandle(user=user, db='moo', shot=1, run=1)
+    user = "/some/path/imasdb"
+    h = ImasHandle(user=user, db="moo", shot=1, run=1)
 
     assert h.is_local_db
-    assert str(h.path().parent) == '/some/path/imasdb/moo/3/0'
+    assert str(h.path().parent) == "/some/path/imasdb/moo/3/0"

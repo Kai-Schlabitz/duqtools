@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from ._handle import ImasHandle
 
-INDEX_STR = '*'
+INDEX_STR = "*"
 
 
 class EmptyVarError(Exception):
@@ -23,20 +23,19 @@ class EmptyVarError(Exception):
 
 def insert_re_caret_dollar(string: str) -> str:
     """Insert regex start (^) / end ($) of line matching characters."""
-    if not string.startswith('^'):
-        string = f'^{string}'
-    if not string.endswith('$'):
-        string = f'{string}$'
+    if not string.startswith("^"):
+        string = f"^{string}"
+    if not string.endswith("$"):
+        string = f"{string}$"
     return string
 
 
 def replace_index_str(string: str) -> str:
     """Replaces template string with regex digit matching."""
-    return string.replace(INDEX_STR, r'(\d+)')
+    return string.replace(INDEX_STR, r"(\d+)")
 
 
 class IDSMapping(Mapping):
-
     def __init__(self, ids: Any) -> None:
         """Map the IMASDB object.
 
@@ -62,10 +61,10 @@ class IDSMapping(Mapping):
         self.dive(ids, [])
 
     def __repr__(self):
-        s = f'{self.__class__.__name__}(\n'
+        s = f"{self.__class__.__name__}(\n"
         for key in self._paths:
-            s += f'  {key} = ...\n'
-        s += ')\n'
+            s += f"  {key} = ...\n"
+        s += ")\n"
 
         return s
 
@@ -83,7 +82,7 @@ class IDSMapping(Mapping):
 
     def _deconstruct_key(self, key: str) -> tuple[Any, str]:
         """Break down key and return pointer + attr."""
-        *parts, attr = key.split('/')
+        *parts, attr = key.split("/")
 
         pointer = self._ids
 
@@ -93,7 +92,6 @@ class IDSMapping(Mapping):
         return pointer, attr
 
     def __getitem__(self, key: str) -> Any:
-
         try:
             pointer, attr = self._deconstruct_key(key)
             ret = self._getattr(pointer, attr)
@@ -105,7 +103,6 @@ class IDSMapping(Mapping):
         return ret
 
     def __setitem__(self, key: str, value: np.ndarray):
-
         try:
             pointer, attr = self._deconstruct_key(key)
             getattr(pointer, attr)
@@ -126,21 +123,20 @@ class IDSMapping(Mapping):
         return key in self._keys
 
     @staticmethod
-    def _path_at_index(variable: str | IDSVariableModel,
-                       index: int | Sequence[int]):
-        path = variable.path if isinstance(variable,
-                                           IDSVariableModel) else variable
+    def _path_at_index(variable: str | IDSVariableModel, index: int | Sequence[int]):
+        path = variable.path if isinstance(variable, IDSVariableModel) else variable
 
         if isinstance(index, int):
-            index = (index, )
+            index = (index,)
 
         for i in index:
-            path = path.replace('*', str(i), 1)
+            path = path.replace("*", str(i), 1)
 
         return path
 
-    def get_at_index(self, variable: str | IDSVariableModel,
-                     index: int | Sequence[int], **kwargs) -> Any:
+    def get_at_index(
+        self, variable: str | IDSVariableModel, index: int | Sequence[int], **kwargs
+    ) -> Any:
         """Grab key with index replacement.
 
         Example: `IDSMapping.get_at_index(var, index=0)`
@@ -148,8 +144,13 @@ class IDSMapping(Mapping):
         path = self._path_at_index(variable, index)
         return self[path]
 
-    def set_at_index(self, variable: str | IDSVariableModel,
-                     index: int | Sequence[int], value: Any, **kwargs):
+    def set_at_index(
+        self,
+        variable: str | IDSVariableModel,
+        index: int | Sequence[int],
+        value: Any,
+        **kwargs,
+    ):
         """Grab key with index replacement.
 
         Example: `IDSMapping.set_at_index(var, value, index=0)`
@@ -213,15 +214,15 @@ class IDSMapping(Mapping):
         if isinstance(val, str):
             return
 
-        if hasattr(val,
-                   '__getitem__') and not isinstance(val,
-                                                     (np.ndarray, np.generic)):
+        if hasattr(val, "__getitem__") and not isinstance(
+            val, (np.ndarray, np.generic)
+        ):
             for i in range(len(val)):
                 item = val[i]
                 self.dive(item, path + [str(i)])
             return
 
-        if hasattr(val, '__dict__'):
+        if hasattr(val, "__dict__"):
             for key, item in val.__dict__.items():
                 self.dive(item, path + [key])
             return
@@ -233,7 +234,7 @@ class IDSMapping(Mapping):
             return
 
         # We made it here, the value can be stored
-        str_path = '/'.join(path)
+        str_path = "/".join(path)
         self._keys.add(str_path)
 
         cur = self._paths
@@ -299,7 +300,7 @@ class IDSMapping(Mapping):
         nodes = self[root]
 
         for index in range(len(nodes)):
-            path = f'{root}/{index}/{sub}'
+            path = f"{root}/{index}/{sub}"
 
             if remaining:
                 sub_arr = self._read_array_from_parts(path, *remaining)
@@ -343,8 +344,7 @@ class IDSMapping(Mapping):
             elif isinstance(arr, (float, int)):
                 return False
             else:
-                raise ValueError(
-                    f"Don't know how to deal with: {var.name}: {arr}")
+                raise ValueError(f"Don't know how to deal with: {var.name}: {arr}")
 
         import xarray as xr
 
@@ -355,7 +355,7 @@ class IDSMapping(Mapping):
         variables = lookup_vars(variables)
 
         for var in variables:
-            parts = var.path.split('/*/')
+            parts = var.path.split("/*/")
 
             if len(parts) == 1:
                 xr_data_vars[var.name] = (var.dims, self[var.path])
@@ -367,8 +367,7 @@ class IDSMapping(Mapping):
                 if empty_var_ok:
                     continue
                 else:
-                    raise EmptyVarError(
-                        f'Variable {var.name!r} contains empty data.')
+                    raise EmptyVarError(f"Variable {var.name!r} contains empty data.")
             xr_data_vars[var.name] = ([*var.dims], arr)
 
         ds = xr.Dataset(data_vars=xr_data_vars)  # type: ignore
@@ -382,18 +381,17 @@ class IDSMapping(Mapping):
         """
         if len(parts) < 2:
             # Write back
-            path, = parts
+            (path,) = parts
             self[path] = data
             return
 
         root, sub, *remaining = parts
         nodes = self[root]
         for index in range(len(nodes)):
-            path = f'{root}/{index}/{sub}'
+            path = f"{root}/{index}/{sub}"
             self._write_array_in_parts(data[index], path, *remaining)
 
-    def write_array_in_parts(self, variable_path: str,
-                             data: xr.DataArray) -> None:
+    def write_array_in_parts(self, variable_path: str, data: xr.DataArray) -> None:
         """write_back data, give the data, and the variable path, where `*`
         denotes the dimensions. This function will figure out how to write it
         back to the IDS.
@@ -410,5 +408,5 @@ class IDSMapping(Mapping):
         -------
         None
         """
-        parts = variable_path.split('/*/')
+        parts = variable_path.split("/*/")
         self._write_array_in_parts(data.data, *parts)

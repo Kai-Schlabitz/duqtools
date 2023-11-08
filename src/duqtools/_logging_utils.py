@@ -55,12 +55,11 @@ class LoggingContext:
 
 
 # Logger to use in duqtools
-duqlog_screen = logging.getLogger(
-    'screen')  # logger to log to the screen (and the log)
+duqlog_screen = logging.getLogger("screen")  # logger to log to the screen (and the log)
 
 
 def initialize_duqlog_screen():
     # Logger for stdout
     stream = logging.StreamHandler()
-    stream.setFormatter(logging.Formatter('%(message)s'))
+    stream.setFormatter(logging.Formatter("%(message)s"))
     duqlog_screen.addHandler(stream)

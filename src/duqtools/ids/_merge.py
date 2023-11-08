@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 info = logger.info
 
 
-@add_to_op_queue('Merging to', '{target}')
+@add_to_op_queue("Merging to", "{target}")
 def merge_data(
     handles: Sequence[ImasHandle],
     target: ImasHandle,
@@ -70,11 +70,10 @@ def merge_data(
 
         # Do not rebase to target if the target is empty
         if not target_ids:
-            info('target %s:%s contains no data, skipping', target, ids_name)
+            info("target %s:%s contains no data, skipping", target, ids_name)
             continue
 
-        target_data = target_ids.to_xarray(variables=ids_vars,
-                                           empty_var_ok=True)
+        target_data = target_ids.to_xarray(variables=ids_vars, empty_var_ok=True)
         target_data = squash_placeholders(target_data)
 
         ids_data = [
@@ -83,18 +82,18 @@ def merge_data(
         ]
 
         ids_data = rebase_all_coords(ids_data, target_data)
-        ids_data = xr.concat(ids_data, 'handle')
+        ids_data = xr.concat(ids_data, "handle")
 
         # Now we have to get the stddeviations
-        mean_data = ids_data.mean(dim='handle')
-        std_data = ids_data.std(dim='handle', skipna=True)
+        mean_data = ids_data.mean(dim="handle")
+        std_data = ids_data.std(dim="handle", skipna=True)
 
         # Then, write it back to target
         for name in ids_data.data_vars.keys():
             path = variable_dict[name].path
             target_ids.write_array_in_parts(path, mean_data[name])
 
-            path_upper = path + '_error_upper'
+            path_upper = path + "_error_upper"
             target_ids.write_array_in_parts(path_upper, std_data[name])
 
         target_ids.sync(target)

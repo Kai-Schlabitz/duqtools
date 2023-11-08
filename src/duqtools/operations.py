@@ -15,18 +15,18 @@ from .schema import BaseModel
 
 logger = logging.getLogger(__name__)
 
-OP_STYLE = {'fg': 'green'}
+OP_STYLE = {"fg": "green"}
 
-INFO_STYLE = {'fg': 'blue'}
+INFO_STYLE = {"fg": "blue"}
 
 NO_OP_STYLE = {
-    'fg': 'red',
-    'bold': True,
+    "fg": "red",
+    "bold": True,
 }
 
 HEADER_STYLE = {
-    'fg': 'red',
-    'bold': True,
+    "fg": "red",
+    "bold": True,
 }
 
 loginfo = duqlog_screen.info
@@ -35,25 +35,23 @@ style = click.style
 
 
 class LongDescription(BaseModel):
-    description: str = Field(
-        description='description of the operation to be done')
-    extra_description: Optional[str] = Field(None,
-                                             description='Extra description')
-    style: dict[str, Any] = Field(OP_STYLE,
-                                  description='Styling for op description')
+    description: str = Field(description="description of the operation to be done")
+    extra_description: Optional[str] = Field(None, description="Extra description")
+    style: dict[str, Any] = Field(OP_STYLE, description="Styling for op description")
 
     @property
     def long_description(self) -> str:
         description = style(self.description, **self.style)
 
         if self.extra_description:
-            description = f'{description} : {self.extra_description}'
+            description = f"{description} : {self.extra_description}"
 
         return description
 
 
 class Warning(LongDescription):
     """Warning item for screen log."""
+
     style: dict[str, Any] = NO_OP_STYLE
 
     def __hash__(self):
@@ -68,25 +66,26 @@ class Operation(LongDescription):
 
     Usually not called directly but used through Operations.
     """
-    quiet: bool = Field(False,
-                        description='print out this operation to the screen')
+
+    quiet: bool = Field(False, description="print out this operation to the screen")
 
     action: Optional[Callable] = Field(
         None,
-        description='a function which can be executed when we '
-        'decide to apply this operation')
+        description="a function which can be executed when we "
+        "decide to apply this operation",
+    )
 
     args: Optional[Sequence] = Field(
         None,
         validate_default=True,
-        description='positional arguments that have to be '
-        'passed to the action')
+        description="positional arguments that have to be " "passed to the action",
+    )
 
     kwargs: Optional[dict] = Field(
         None,
         validate_default=True,
-        description='keyword arguments that will be '
-        'passed to the action')
+        description="keyword arguments that will be " "passed to the action",
+    )
 
     def __call__(self) -> Operation:
         """Execute the action with the args and kwargs.
@@ -101,13 +100,13 @@ class Operation(LongDescription):
             self.action(*self.args, **self.kwargs)  # type: ignore
         return self
 
-    @field_validator('args')
+    @field_validator("args")
     def validate_args(cls, v):
         if v is None:
             v = ()
         return v
 
-    @field_validator('kwargs')
+    @field_validator("kwargs")
     def validate_kwargs(cls, v):
         if v is None:
             v = {}
@@ -154,26 +153,28 @@ class Operations(deque):
         """
         self.append(Operation(**kwargs))
 
-    def add_no_op(self,
-                  description: str,
-                  extra_description: str | None = None):
+    def add_no_op(self, description: str, extra_description: str | None = None):
         """Adds a line to specify an action will not be undertaken."""
-        self.add(action=None,
-                 description=description,
-                 extra_description=extra_description,
-                 style=NO_OP_STYLE)
+        self.add(
+            action=None,
+            description=description,
+            extra_description=extra_description,
+            style=NO_OP_STYLE,
+        )
 
     def info(self, description: str, extra_description: Optional[str] = None):
         """Adds an info line."""
-        self.add(action=None,
-                 description=description,
-                 extra_description=extra_description,
-                 style=INFO_STYLE)
+        self.add(
+            action=None,
+            description=description,
+            extra_description=extra_description,
+            style=INFO_STYLE,
+        )
 
     def warning(self, description: str, extra_description: str):
         self.warnings.add(
-            Warning(description=description,
-                    extra_description=extra_description))
+            Warning(description=description, extra_description=extra_description)
+        )
 
     def put(self, item: Operation):
         """Synonym for append."""
@@ -182,11 +183,10 @@ class Operations(deque):
     def append(self, item: Operation):  # type: ignore
         """Restrict our diet to Operation objects only."""
         if self.enabled:
-            logger.debug(
-                f'Appended {item.description} to the operations queue')
+            logger.debug(f"Appended {item.description} to the operations queue")
             super().append(item)
         else:
-            loginfo('- ' + item.long_description)
+            loginfo("- " + item.long_description)
             item()
 
     def apply(self) -> Operation:
@@ -208,12 +208,13 @@ class Operations(deque):
         and show a fancy progress bar while applying
         """
         from tqdm import tqdm
-        loginfo(style('Applying Operations', **HEADER_STYLE))  # type: ignore
+
+        loginfo(style("Applying Operations", **HEADER_STYLE))  # type: ignore
 
         with tqdm(total=self.n_actions, position=1) as pbar:
-            pbar.set_description('Progress')
+            pbar.set_description("Progress")
 
-            with tqdm(bar_format='{desc}') as dbar:
+            with tqdm(bar_format="{desc}") as dbar:
 
                 def callback(op):
                     if not op.action:
@@ -232,34 +233,31 @@ class Operations(deque):
         bool: did we apply everything or not
         """
         # To print the descriptions we need to get them
-        loginfo('')
-        loginfo(style('Operations in the Queue:',
-                      **HEADER_STYLE))  # type: ignore
-        loginfo(style('========================',
-                      **HEADER_STYLE))  # type: ignore
+        loginfo("")
+        loginfo(style("Operations in the Queue:", **HEADER_STYLE))  # type: ignore
+        loginfo(style("========================", **HEADER_STYLE))  # type: ignore
         for op in self:
             if not op.quiet:
-                loginfo('- ' + op.long_description)
+                loginfo("- " + op.long_description)
 
         for warning in self.warnings:
-            loginfo('- ' + warning.long_description)
+            loginfo("- " + warning.long_description)
 
         if self.dry_run:
-            loginfo('Dry run enabled, not applying op_queue')
+            loginfo("Dry run enabled, not applying op_queue")
             return False
 
         # Do not confirm if all actions are no-op
         if all(op.action is None for op in self):
-            loginfo('\nNo actions to execute.')
+            loginfo("\nNo actions to execute.")
             return False
 
         if n_no_op := sum(op.action is None for op in self):
-            loginfo(
-                f'\nThere are {n_no_op} operations that will not be applied.')
+            loginfo(f"\nThere are {n_no_op} operations that will not be applied.")
 
         is_confirmed = self.yes or click.confirm(
-            f'\nDo you want to apply all {self.n_actions} operations?',
-            default=False)
+            f"\nDo you want to apply all {self.n_actions} operations?", default=False
+        )
 
         if is_confirmed:
             self.apply_all()
@@ -271,8 +269,14 @@ class Operations(deque):
         executed."""
         if self:
             logwarning(
-                style((f'There are still {self.n_actions} operations '
-                       'in the queue at program exit!'), **HEADER_STYLE))
+                style(
+                    (
+                        f"There are still {self.n_actions} operations "
+                        "in the queue at program exit!"
+                    ),
+                    **HEADER_STYLE,
+                )
+            )
 
 
 op_queue = Operations()
@@ -296,7 +300,7 @@ def confirm_operations(func):
 
     def wrapper(*args, **kwargs):
         if op_queue.enabled:
-            raise RuntimeError('op_queue already enabled')
+            raise RuntimeError("op_queue already enabled")
         try:
             op_queue.enabled = True
             ret = func(*args, **kwargs)
@@ -332,7 +336,6 @@ def add_to_op_queue(op_desc: str, extra_desc: str | None = None, quiet=False):
     """
 
     def op_queue_real(func):
-
         def wrapper(*args, **kwargs) -> None:
             # For the description format we must convert args to kwargs
             sig = signature(func)
@@ -345,12 +348,14 @@ def add_to_op_queue(op_desc: str, extra_desc: str | None = None, quiet=False):
             op_formatted = op_desc.format(**fkwargs)
 
             # add the function to the queue
-            op_queue.add(action=func,
-                         args=args,
-                         kwargs=kwargs,
-                         description=op_formatted,
-                         extra_description=extra_formatted,
-                         quiet=quiet)
+            op_queue.add(
+                action=func,
+                args=args,
+                kwargs=kwargs,
+                description=op_formatted,
+                extra_description=extra_formatted,
+                quiet=quiet,
+            )
 
         return wrapper
 
@@ -368,7 +373,7 @@ def op_queue_context():
     Works more or less the same as the `@confirm_operations` decorator
     """
     if op_queue.enabled:
-        raise RuntimeError('op_queue already enabled')
+        raise RuntimeError("op_queue already enabled")
     try:
         op_queue.enabled = True
         yield

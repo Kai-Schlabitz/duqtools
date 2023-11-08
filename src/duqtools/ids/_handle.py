@@ -24,22 +24,23 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-_FILENAME = 'ids_{shot}{run:04d}{suffix}'
-_IMASDB = ('{db}', '3', '0')
-GLOBAL_PATH_TEMPLATE = str(Path.home().parent.joinpath('{user}', 'public',
-                                                       'imasdb', *_IMASDB,
-                                                       _FILENAME))
-LOCAL_PATH_TEMPLATE = str(Path('{user}', *_IMASDB, _FILENAME))
-PUBLIC_PATH_TEMPLATE = str(Path('shared', 'imasdb', *_IMASDB, _FILENAME))
+_FILENAME = "ids_{shot}{run:04d}{suffix}"
+_IMASDB = ("{db}", "3", "0")
+GLOBAL_PATH_TEMPLATE = str(
+    Path.home().parent.joinpath("{user}", "public", "imasdb", *_IMASDB, _FILENAME)
+)
+LOCAL_PATH_TEMPLATE = str(Path("{user}", *_IMASDB, _FILENAME))
+PUBLIC_PATH_TEMPLATE = str(Path("shared", "imasdb", *_IMASDB, _FILENAME))
 
 SUFFIXES = (
-    '.datafile',
-    '.characteristics',
-    '.tree',
+    ".datafile",
+    ".characteristics",
+    ".tree",
 )
 
 IMAS_PATTERN = re.compile(
-    r'^((?P<user>[\\\/\w]*)\/)?(?P<db>\w+)\/(?P<shot>\d+)\/(?P<run>\d+)$')
+    r"^((?P<user>[\\\/\w]*)\/)?(?P<db>\w+)\/(?P<shot>\d+)\/(?P<run>\d+)$"
+)
 
 
 def _patch_str_repr(obj: object):
@@ -50,16 +51,15 @@ def _patch_str_repr(obj: object):
         type_ = type(x)
         module = type_.__module__
         qualname = type_.__qualname__
-        return f'<{module}.{qualname} object at {hex(id(x))}>'
+        return f"<{module}.{qualname} object at {hex(id(x))}>"
 
     obj.__str__ = types.MethodType(true_repr, obj)  # type: ignore
     obj.__repr__ = types.MethodType(true_repr, obj)  # type: ignore
 
 
 class ImasHandle(ImasBaseModel):
-
     def __str__(self):
-        return f'{self.user}/{self.db}/{self.shot}/{self.run}'
+        return f"{self.user}/{self.db}/{self.shot}/{self.run}"
 
     @classmethod
     def from_string(cls, string: str) -> ImasHandle:
@@ -90,14 +90,14 @@ class ImasHandle(ImasBaseModel):
         if match:
             return cls(**match.groupdict())
 
-        raise ValueError(f'Could not match {string!r}')
+        raise ValueError(f"Could not match {string!r}")
 
-    @field_validator('user')
+    @field_validator("user")
     def user_rel_path(cls, v, values):
         # Override user if we have a relative location
-        if relative_location := values.data['relative_location']:
+        if relative_location := values.data["relative_location"]:
             logger.info(
-                f'Updating imasdb location with relative location {relative_location}'
+                f"Updating imasdb location with relative location {relative_location}"
             )
             return os.path.abspath(relative_location)
         return v
@@ -115,38 +115,37 @@ class ImasHandle(ImasBaseModel):
         if self.is_local_db:
             # jintrac v220922
             self.path().parent.mkdir(parents=True, exist_ok=True)
-        elif self.user == getuser() or self.user == 'public':
+        elif self.user == getuser() or self.user == "public":
             # jintrac v210921
             pass
         else:
-            raise ValueError(f'Invalid user: {self.user}')
+            raise ValueError(f"Invalid user: {self.user}")
 
     def to_string(self) -> str:
         """Generate string representation of Imas location."""
-        return f'{self.user}/{self.db}/{self.shot}/{self.run}'
+        return f"{self.user}/{self.db}/{self.shot}/{self.run}"
 
     @property
     def is_local_db(self):
         """Return True if the handle points to a local imas database."""
-        return self.user.startswith('/')
+        return self.user.startswith("/")
 
     def path(self, suffix=SUFFIXES[0]) -> Path:
         """Return location as Path."""
-        imas_home = os.environ.get('IMAS_HOME')
+        imas_home = os.environ.get("IMAS_HOME")
 
         if self.is_local_db:
             template = LOCAL_PATH_TEMPLATE
-        elif imas_home and self.user == 'public':
-            template = imas_home + '/' + PUBLIC_PATH_TEMPLATE
+        elif imas_home and self.user == "public":
+            template = imas_home + "/" + PUBLIC_PATH_TEMPLATE
         else:
             template = GLOBAL_PATH_TEMPLATE
 
         return Path(
-            template.format(user=self.user,
-                            db=self.db,
-                            shot=self.shot,
-                            run=self.run,
-                            suffix=suffix))
+            template.format(
+                user=self.user, db=self.db, shot=self.shot, run=self.run, suffix=suffix
+            )
+        )
 
     def paths(self) -> List[Path]:
         """Return location of all files as a list of Paths."""
@@ -174,27 +173,27 @@ class ImasHandle(ImasBaseModel):
         destination : ImasHandle
             Copy data to a new location.
         """
-        logger.debug('Copy %s to %s', self, destination)
+        logger.debug("Copy %s to %s", self, destination)
 
         try:
             copy_ids_entry(self, destination)
         except Exception as err:
-            raise OSError(f'Failed to copy {self}') from err
+            raise OSError(f"Failed to copy {self}") from err
 
-    @add_to_op_queue('Removing ids', '{self}')
+    @add_to_op_queue("Removing ids", "{self}")
     def delete(self):
         """Remove data from entry."""
         # ERASE_PULSE operation is yet supported by IMAS as of June 2022
         path = self.path()
         for suffix in SUFFIXES:
             to_delete = path.with_suffix(suffix)
-            logger.debug('Removing %s', to_delete)
+            logger.debug("Removing %s", to_delete)
             try:
                 to_delete.unlink()
             except FileNotFoundError:
-                logger.warning('%s does not exist', to_delete)
+                logger.warning("%s does not exist", to_delete)
 
-    def get_raw_data(self, ids: str = 'core_profiles', **kwargs):
+    def get_raw_data(self, ids: str = "core_profiles", **kwargs):
         """Get data from IDS entry.
 
         Parameters
@@ -216,7 +215,7 @@ class ImasHandle(ImasBaseModel):
 
         return data
 
-    def get(self, ids: str = 'core_profiles') -> IDSMapping:
+    def get(self, ids: str = "core_profiles") -> IDSMapping:
         """Map the data to a dict-like structure.
 
         Parameters
@@ -235,7 +234,7 @@ class ImasHandle(ImasBaseModel):
         self,
         extra_variables: Sequence[IDSVariableModel] = [],
         squash: bool = True,
-        ids: str = 'core_profiles',
+        ids: str = "core_profiles",
         **kwargs,
     ) -> xr.Dataset:
         """Get all variables that duqtools knows of from selected ids from the
@@ -266,12 +265,8 @@ class ImasHandle(ImasBaseModel):
         from duqtools.config import var_lookup
 
         idsvar_lookup = var_lookup.filter_ids(ids)
-        variables = list(
-            set(list(extra_variables) + list(idsvar_lookup.keys())))
-        return self.get_variables(variables,
-                                  squash,
-                                  empty_var_ok=True,
-                                  **kwargs)
+        variables = list(set(list(extra_variables) + list(idsvar_lookup.keys())))
+        return self.get_variables(variables, squash, empty_var_ok=True, **kwargs)
 
     def get_variables(
         self,
@@ -304,13 +299,13 @@ class ImasHandle(ImasBaseModel):
             When variables are from multiple IDSs.
         """
         from duqtools.config import lookup_vars
+
         var_models = lookup_vars(variables)
 
         idss = {var.ids for var in var_models}
 
         if len(idss) > 1:
-            raise ValueError(
-                f'All variables must belong to the same IDS, got {idss}')
+            raise ValueError(f"All variables must belong to the same IDS, got {idss}")
 
         ids = var_models[0].ids
 
@@ -358,17 +353,18 @@ class ImasHandle(ImasBaseModel):
         opcode, _ = entry.open()
 
         if opcode == 0:
-            logger.debug('Data entry opened: %s', self)
+            logger.debug("Data entry opened: %s", self)
         elif create:
             cpcode, _ = entry.create()
             if cpcode == 0:
-                logger.debug('Data entry created: %s', self)
+                logger.debug("Data entry created: %s", self)
             else:
                 raise OSError(
-                    f'Cannot create data entry: {self}. '
-                    f'Create a new db first using `imasdb {self.db}`')
+                    f"Cannot create data entry: {self}. "
+                    f"Create a new db first using `imasdb {self.db}`"
+                )
         else:
-            raise OSError(f'Data entry does not exist: {self}')
+            raise OSError(f"Data entry does not exist: {self}")
 
         try:
             yield entry

@@ -8,7 +8,7 @@ from pydantic import RootModel as PydanticRootModel
 class BaseModel(PydanticBaseModel):
     """Base model."""
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra="forbid")
 
 
 class RootModel(PydanticRootModel):

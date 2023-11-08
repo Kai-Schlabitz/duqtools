@@ -16,10 +16,10 @@ def _check_data_csv(data_csv: str, length: int):
 
 
 def test_data_csv_4_col():
-    data = TEST_DATA / 'data_4_col.csv'
+    data = TEST_DATA / "data_4_col.csv"
     _check_data_csv(data, length=10)
 
 
 def test_data_csv_5_col():
-    data = TEST_DATA / 'data_5_col.csv'
+    data = TEST_DATA / "data_5_col.csv"
     _check_data_csv(data, length=25)

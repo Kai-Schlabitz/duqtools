@@ -22,12 +22,12 @@ class SubmitError(Exception):
     ...
 
 
-def Spinner(frames='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'):
+def Spinner(frames="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"):
     """Simple spinner animation."""
     yield from cycle(frames)
 
 
-@add_to_op_queue('Submitting', '{job}')
+@add_to_op_queue("Submitting", "{job}")
 def _submit_job(job: Job, *, delay: float = 0):
     """
     Parameters
@@ -44,13 +44,13 @@ def _submit_job(job: Job, *, delay: float = 0):
 def job_submitter(jobs: Sequence[Job], *, max_jobs: int, **kwargs):
     for n, job in enumerate(jobs):
         if max_jobs and (n >= max_jobs):
-            info(f'Max jobs ({max_jobs}) reached.')
+            info(f"Max jobs ({max_jobs}) reached.")
             break
 
         _submit_job(job, delay=0.1)
 
 
-@add_to_op_queue('Start job scheduler')
+@add_to_op_queue("Start job scheduler")
 def job_scheduler(queue: Deque[Job], *, max_jobs: int = 10, **kwargs):
     interval = 1.0
 
@@ -76,9 +76,9 @@ def job_scheduler(queue: Deque[Job], *, max_jobs: int = 10, **kwargs):
             completed.append(task)
 
         print(
-            f' {next(s)} Running: {len(tasks)},'
-            f' queue: {len(queue)}, completed: {len(completed)}',
-            end='\033[K\r',
+            f" {next(s)} Running: {len(tasks)},"
+            f" queue: {len(queue)}, completed: {len(completed)}",
+            end="\033[K\r",
         )
 
 
@@ -91,30 +91,33 @@ def job_array_submitter(
     cfg: Config,
 ):
     if len(jobs) == 0:
-        duqlog_screen.error('No jobs to submit, not creating array ...')
+        duqlog_screen.error("No jobs to submit, not creating array ...")
         return
 
     for job in jobs:
-        op_queue.add(action=lambda: None,
-                     description='Adding to array',
-                     extra_description=f'{job}')
+        op_queue.add(
+            action=lambda: None,
+            description="Adding to array",
+            extra_description=f"{job}",
+        )
 
     if not cfg.create:
-        raise CreateError('Create field required in config file')
+        raise CreateError("Create field required in config file")
 
     system = get_system(cfg=cfg)
 
-    system.submit_array(jobs,
-                        max_jobs=max_jobs,
-                        max_array_size=max_array_size,
-                        create_only=create_only)
+    system.submit_array(
+        jobs, max_jobs=max_jobs, max_array_size=max_array_size, create_only=create_only
+    )
 
 
 def submission_script_ok(job) -> bool:
     submission_script = job.submit_script
     if not submission_script.is_file():
-        info('Did not found submission script %s ; Skipping directory...',
-             submission_script)
+        info(
+            "Did not found submission script %s ; Skipping directory...",
+            submission_script,
+        )
         return False
 
     return True
@@ -124,13 +127,17 @@ def status_file_ok(job, *, force: bool) -> bool:
     status_file = job.status_file
     if job.has_status and not force:
         if not status_file.is_file():
-            logger.warning('Status file %s is not a file', status_file)
+            logger.warning("Status file %s is not a file", status_file)
         with open(status_file) as f:
-            info('Status of %s: %s. To rerun enable the --force flag',
-                 status_file, f.read())
+            info(
+                "Status of %s: %s. To rerun enable the --force flag",
+                status_file,
+                f.read(),
+            )
         op_queue.add_no_op(
-            description='Not Submitting',
-            extra_description=f'{job} (reason: status file exists)')
+            description="Not Submitting",
+            extra_description=f"{job} (reason: status file exists)",
+        )
         return False
 
     return True
@@ -140,15 +147,17 @@ def lockfile_ok(job: Job, *, force: bool) -> bool:
     lockfile = job.lockfile
     if lockfile.exists() and not force:
         op_queue.add_no_op(
-            description='Not Submitting',
-            extra_description=f'{job} (reason: {lockfile} exists)')
+            description="Not Submitting",
+            extra_description=f"{job} (reason: {lockfile} exists)",
+        )
         return False
 
     return True
 
 
-def get_resubmit_jobs(cfg: Config, *, resubmit_names: Sequence[Path],
-                      locations: Locations) -> list[Job]:
+def get_resubmit_jobs(
+    cfg: Config, *, resubmit_names: Sequence[Path], locations: Locations
+) -> list[Job]:
     """Get list of jobs to resubmit.
 
     Parameters
@@ -177,19 +186,21 @@ def get_resubmit_jobs(cfg: Config, *, resubmit_names: Sequence[Path],
     return jobs
 
 
-def submit(*,
-           cfg: Config,
-           force: bool = False,
-           max_jobs: int = 10,
-           max_array_size: int = 100,
-           schedule: bool = False,
-           array: bool = False,
-           array_script: bool = False,
-           limit: Optional[int] = None,
-           resubmit: Sequence[Path] = (),
-           status_filter: Sequence[str] = (),
-           parent_dir: Optional[Path] = None,
-           **kwargs):
+def submit(
+    *,
+    cfg: Config,
+    force: bool = False,
+    max_jobs: int = 10,
+    max_array_size: int = 100,
+    schedule: bool = False,
+    array: bool = False,
+    array_script: bool = False,
+    limit: Optional[int] = None,
+    resubmit: Sequence[Path] = (),
+    status_filter: Sequence[str] = (),
+    parent_dir: Optional[Path] = None,
+    **kwargs,
+):
     """Submit jobs to the cluster.
 
     Parameters
@@ -222,23 +233,24 @@ def submit(*,
     locations = Locations(parent_dir=parent_dir, cfg=cfg)
 
     if resubmit:
-        jobs = get_resubmit_jobs(cfg=cfg,
-                                 resubmit_names=resubmit,
-                                 locations=locations)
+        jobs = get_resubmit_jobs(cfg=cfg, resubmit_names=resubmit, locations=locations)
         force = True
     else:
         jobs = [Job(run.dirname, cfg=cfg) for run in locations.runs]
 
-    debug('Case directories: %s', jobs)
+    debug("Case directories: %s", jobs)
 
     job_queue: Deque[Job] = deque()
 
-    if array and Path('./duqtools_slurm_array.sh').exists() and not force:
+    if array and Path("./duqtools_slurm_array.sh").exists() and not force:
         op_queue.add_no_op(
-            description='Not Creating Array',
-            extra_description='(reason: duqtools_slurm_array.sh exists)')
-        op_queue.add_no_op(description='Not Submitting Array',
-                           extra_description='use --force to override')
+            description="Not Creating Array",
+            extra_description="(reason: duqtools_slurm_array.sh exists)",
+        )
+        op_queue.add_no_op(
+            description="Not Submitting Array",
+            extra_description="use --force to override",
+        )
         return job_queue
 
     for job in jobs:
@@ -253,17 +265,19 @@ def submit(*,
         job_queue.append(job)
 
         if len(job_queue) == limit:
-            info('Limiting total number of jobs to: %d', len(job_queue))
+            info("Limiting total number of jobs to: %d", len(job_queue))
             break
 
     if schedule:
         job_scheduler(job_queue, max_jobs=max_jobs)
     elif array or array_script:
-        job_array_submitter(job_queue,
-                            max_jobs=max_jobs,
-                            max_array_size=max_array_size,
-                            create_only=array_script,
-                            cfg=cfg)
+        job_array_submitter(
+            job_queue,
+            max_jobs=max_jobs,
+            max_array_size=max_array_size,
+            create_only=array_script,
+            cfg=cfg,
+        )
     else:
         job_submitter(job_queue, max_jobs=max_jobs)
 

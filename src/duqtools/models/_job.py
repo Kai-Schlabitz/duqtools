@@ -17,22 +17,22 @@ info, debug = logger.info, logger.debug
 cs = click.style
 
 STATUS_SYMBOLS = {
-    'no status': cs('_', fg='yellow'),
-    'completed': cs('.', fg='green'),
-    'failed': cs('f', fg='red'),
-    'running': cs('r', fg='yellow'),
-    'submitted': cs('s', fg='yellow'),
-    'unknown': cs('u', fg='yellow')
+    "no status": cs("_", fg="yellow"),
+    "completed": cs(".", fg="green"),
+    "failed": cs("f", fg="red"),
+    "running": cs("r", fg="yellow"),
+    "submitted": cs("s", fg="yellow"),
+    "unknown": cs("u", fg="yellow"),
 }
 
 
 class JobStatus(str, Enum):
-    NOSTATUS = 'no status'
-    COMPLETED = 'completed'
-    FAILED = 'failed'
-    RUNNING = 'running'
-    SUBMITTED = 'submitted'
-    UNKNOWN = 'unknown'
+    NOSTATUS = "no status"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    RUNNING = "running"
+    SUBMITTED = "submitted"
+    UNKNOWN = "unknown"
 
     @property
     def symbol(self):
@@ -40,13 +40,11 @@ class JobStatus(str, Enum):
 
     @staticmethod
     def symbol_help():
-        s = ', '.join(f'{code} : {status}'
-                      for status, code in STATUS_SYMBOLS.items())
-        return f'Status codes:\n{s}'
+        s = ", ".join(f"{code} : {status}" for status, code in STATUS_SYMBOLS.items())
+        return f"Status codes:\n{s}"
 
 
 class Job:
-
     def __init__(self, path: Path, *, cfg: Config):
         """Summary.
 
@@ -62,7 +60,7 @@ class Job:
 
     def __repr__(self):
         run = str(self.path)
-        return f'{self.__class__.__name__}({run!r})'
+        return f"{self.__class__.__name__}({run!r})"
 
     @staticmethod
     def status_symbol_help():
@@ -87,7 +85,7 @@ class Job:
     @property
     def is_submitted(self) -> bool:
         """Return true if the job has been submitted."""
-        return (self.path / 'duqtools.submit.lock').exists()
+        return (self.path / "duqtools.submit.lock").exists()
 
     def status(self) -> str:
         """Return the status of the job."""
@@ -152,12 +150,13 @@ class Job:
     @property
     def lockfile(self) -> Path:
         """Return the path of the lockfile."""
-        return self.path / 'duqtools.submit.lock'
+        return self.path / "duqtools.submit.lock"
 
     def submit(self):
         """Submit job."""
         from duqtools.systems import get_system
-        debug(f'Put lockfile in place for {self.lockfile}')
+
+        debug(f"Put lockfile in place for {self.lockfile}")
         self.lockfile.touch()
 
         get_system(self.cfg).submit_job(self)
@@ -165,7 +164,7 @@ class Job:
     def start(self):
         """Submit job and return generate that raises StopIteration when
         done."""
-        click.echo(f'Submitting {self}\033[K')
+        click.echo(f"Submitting {self}\033[K")
         self.submit()
 
         while self.status() in (JobStatus.RUNNING, JobStatus.NOSTATUS):

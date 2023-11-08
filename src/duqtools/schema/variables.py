@@ -8,11 +8,15 @@ from ._basemodel import BaseModel
 
 
 class IDSPath(BaseModel):
-    ids: str = Field(description='Root IDS name.')
-    path: str = Field(description=f("""
+    ids: str = Field(description="Root IDS name.")
+    path: str = Field(
+        description=f(
+            """
         Path to the data within the IDS.
         The fields are separated by forward slashes (`\\`).
-    """))
+    """
+        )
+    )
 
 
 class IDSVariableModel(IDSPath):
@@ -31,19 +35,31 @@ class IDSVariableModel(IDSPath):
     the 0th time slice). To retrieve all time slices, you can use
     `profiles_1d/*/t_i_ave`.
     """
-    type: str = Field('IDS-variable',
-                      description='discriminator for the variable type')
 
-    name: str = Field(description=f("""
+    type: str = Field("IDS-variable", description="discriminator for the variable type")
+
+    name: str = Field(
+        description=f(
+            """
         Name of the variable.
         This will be used to reference this variable.
-    """))
-    ids: str = Field(description='Root IDS name.')
-    path: str = Field(description=f("""
+    """
+        )
+    )
+    ids: str = Field(description="Root IDS name.")
+    path: str = Field(
+        description=f(
+            """
         Path to the data within the IDS.
         The fields are separated by forward slashes (`/`).
-    """))
-    dims: list[str] = Field(description=f("""
+    """
+        )
+    )
+    dims: list[str] = Field(
+        description=f(
+            """
         Give the dimensions of the data,
         i.e. [x] for 1D, or [x, y] for 2D data.
-    """))
+    """
+        )
+    )

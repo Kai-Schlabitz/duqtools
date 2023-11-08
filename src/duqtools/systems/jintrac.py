@@ -63,15 +63,18 @@ class V220922Mixin:
         from duqtools.ids import ImasHandle
 
         relative_location: Optional[str] = str(
-            os.path.relpath((dirname / 'imasdb').resolve()))
+            os.path.relpath((dirname / "imasdb").resolve())
+        )
         if relative_location:
-            if relative_location.startswith('..'):
+            if relative_location.startswith(".."):
                 relative_location = None
-        return ImasHandle(user=str((dirname / 'imasdb').resolve()),
-                          db=source.db,
-                          shot=source.shot,
-                          run=1,
-                          relative_location=relative_location)
+        return ImasHandle(
+            user=str((dirname / "imasdb").resolve()),
+            db=source.db,
+            shot=source.shot,
+            run=1,
+            relative_location=relative_location,
+        )
 
     def get_data_out_handle(
         self,
@@ -85,12 +88,15 @@ class V220922Mixin:
         from duqtools.ids import ImasHandle
 
         relative_location: Optional[str] = str(
-            os.path.relpath((dirname / 'imasdb').resolve()))
+            os.path.relpath((dirname / "imasdb").resolve())
+        )
         if relative_location:
-            if relative_location.startswith('..'):
+            if relative_location.startswith(".."):
                 relative_location = None
-        return ImasHandle(user=str((dirname / 'imasdb').resolve()),
-                          db=source.db,
-                          shot=source.shot,
-                          run=2,
-                          relative_location=relative_location)
+        return ImasHandle(
+            user=str((dirname / "imasdb").resolve()),
+            db=source.db,
+            shot=source.shot,
+            run=2,
+            relative_location=relative_location,
+        )

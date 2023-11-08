@@ -7,8 +7,7 @@ from duqtools.systems.jetto import IDS2JettoVariableModel, JettoVariableModel
 
 
 class VariableConfigModel(RootModel):
-    root: list[Union[JettoVariableModel, IDSVariableModel,
-                     IDS2JettoVariableModel]]
+    root: list[Union[JettoVariableModel, IDSVariableModel, IDS2JettoVariableModel]]
 
     def __iter__(self):
         yield from self.root

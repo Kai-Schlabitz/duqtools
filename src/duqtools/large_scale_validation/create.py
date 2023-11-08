@@ -20,7 +20,7 @@ def create(*, no_sampling: bool, input_file: str, pattern: str, **kwargs):
         Find runs.yaml files only in subdirectories matching this glob pattern
     """
     if pattern is None:
-        pattern = '**'
+        pattern = "**"
 
     handles = None
     if input_file:
@@ -28,7 +28,7 @@ def create(*, no_sampling: bool, input_file: str, pattern: str, **kwargs):
 
     cwd = Path.cwd()
 
-    config_files = cwd.glob(f'{pattern}/duqtools.yaml')
+    config_files = cwd.glob(f"{pattern}/duqtools.yaml")
 
     for config_file in config_files:
         cfg = load_config(config_file)
@@ -41,7 +41,6 @@ def create(*, no_sampling: bool, input_file: str, pattern: str, **kwargs):
         config_dir = config_file.parent
 
         with work_directory(config_dir):
-            create_entry(cfg=cfg,
-                         absolute_dirpath=True,
-                         no_sampling=no_sampling,
-                         **kwargs)
+            create_entry(
+                cfg=cfg, absolute_dirpath=True, no_sampling=no_sampling, **kwargs
+            )

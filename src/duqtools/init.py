@@ -32,21 +32,24 @@ def init(*, out_file: str, force: bool, **kwargs):
     RuntimeError
         When the config already exists.
     """
-    src = files('duqtools.data') / 'duqtools.yaml'
+    src = files("duqtools.data") / "duqtools.yaml"
 
     config_filepath = Path(out_file)
 
     if config_filepath.exists() and not force:
         raise RuntimeError(
-            f'Refusing to overwrite existing CONFIG, {config_filepath}, '
-            'use --force if you really want to')
+            f"Refusing to overwrite existing CONFIG, {config_filepath}, "
+            "use --force if you really want to"
+        )
 
-    logger.debug('Copying default config from %s to %s', src, config_filepath)
+    logger.debug("Copying default config from %s to %s", src, config_filepath)
 
-    op_queue.add(action=shutil.copy,
-                 kwargs={
-                     'src': src,
-                     'dst': config_filepath,
-                 },
-                 description='Copying config to',
-                 extra_description=f'{config_filepath}')
+    op_queue.add(
+        action=shutil.copy,
+        kwargs={
+            "src": src,
+            "dst": config_filepath,
+        },
+        description="Copying config to",
+        extra_description=f"{config_filepath}",
+    )

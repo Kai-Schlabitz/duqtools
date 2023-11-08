@@ -23,7 +23,7 @@ def no_op(*args, **kwargs):
 def formatter(s):
     """Dedent and remove newlines."""
     s = dedent(s)
-    return s.replace('\n', ' ').strip()
+    return s.replace("\n", " ").strip()
 
 
 @contextmanager
@@ -75,16 +75,17 @@ def read_imas_handles_from_file(inp: PathLike) -> dict[str, ImasHandle]:
 
     inp = Path(inp)
 
-    if inp.suffix == '.csv':
+    if inp.suffix == ".csv":
         handles = {}
         with open(inp) as f:
-            has_header = csv.Sniffer().has_header(''.join(f.readlines(3)))
+            has_header = csv.Sniffer().has_header("".join(f.readlines(3)))
             f.seek(0)
 
             if not has_header:
                 raise IOError(
-                    f'`{inp}` does not have a header. Expecting at least'
-                    '`user`,`db`,`shot`,`run`.')
+                    f"`{inp}` does not have a header. Expecting at least"
+                    "`user`,`db`,`shot`,`run`."
+                )
 
             reader = csv.DictReader(f)
 
@@ -94,23 +95,23 @@ def read_imas_handles_from_file(inp: PathLike) -> dict[str, ImasHandle]:
                 index = row.pop(index_col)
                 handles[index] = ImasHandle(**row)
 
-    elif inp.name == 'runs.yaml':
+    elif inp.name == "runs.yaml":
         with open(inp) as f:
             runs = parse_yaml_raw_as(Runs, f)
         handles = {
-            str(run.dirname):
-            ImasHandle.model_validate(run.data_out, from_attributes=True)
+            str(run.dirname): ImasHandle.model_validate(
+                run.data_out, from_attributes=True
+            )
             for run in runs
         }
 
     else:
-        raise ValueError(f'Cannot open file: {inp}')
+        raise ValueError(f"Cannot open file: {inp}")
 
     return handles
 
 
-def groupby(iterable: Iterable,
-            keyfunc: Callable) -> dict[Hashable, list[Any]]:
+def groupby(iterable: Iterable, keyfunc: Callable) -> dict[Hashable, list[Any]]:
     """Group iterable by key function. The items are grouped by the value that
     is returned by the `keyfunc`
 

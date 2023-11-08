@@ -28,10 +28,9 @@ def plot(*, var_names, handles, input_files, extensions, errorbars, **kwargs):
         handles.update(read_imas_handles_from_file(input_file))
 
     if len(handles) == 0 or len(var_names) == 0:
-        raise SystemExit('No data to show.')
+        raise SystemExit("No data to show.")
 
-    for n, variable in enumerate(var_lookup[var_name]
-                                 for var_name in var_names):
+    for n, variable in enumerate(var_lookup[var_name] for var_name in var_names):
         data_var = variable.name
         time_var = variable.dims[0]
         grid_var = variable.dims[1]
@@ -49,24 +48,21 @@ def plot(*, var_names, handles, input_files, extensions, errorbars, **kwargs):
             datasets.append(ds)
 
         datasets = rebase_all_coords(datasets, datasets[0])
-        dataset = xr.concat(datasets, 'run')
+        dataset = xr.concat(datasets, "run")
 
-        chart = alt_line_chart(dataset,
-                               x=grid_var_norm,
-                               y=data_var,
-                               z=time_var,
-                               std=errorbars)
+        chart = alt_line_chart(
+            dataset, x=grid_var_norm, y=data_var, z=time_var, std=errorbars
+        )
 
-        click.echo('You can now view your plot in your browser:')
-        click.echo('')
+        click.echo("You can now view your plot in your browser:")
+        click.echo("")
 
-        click.secho(f'  {grid_var_norm} vs. {data_var}:\n', fg='green')
+        click.secho(f"  {grid_var_norm} vs. {data_var}:\n", fg="green")
 
         for extension in extensions:
-
-            outfile = Path(f'chart_{grid_var_norm}-{data_var}.{extension}')
-            click.secho(f'    file:///{outfile.absolute()}', bold=True)
+            outfile = Path(f"chart_{grid_var_norm}-{data_var}.{extension}")
+            click.secho(f"    file:///{outfile.absolute()}", bold=True)
 
             chart.save(outfile, scale_factor=2.0)
 
-        click.echo('')
+        click.echo("")

@@ -15,7 +15,7 @@ from .systems.jetto._system import jetto_lookup
 logger = logging.getLogger(__name__)
 info, debug = logger.info, logger.debug
 stream = logging.StreamHandler()
-stream.setFormatter(logging.Formatter('%(message)s'))
+stream.setFormatter(logging.Formatter("%(message)s"))
 logger.addHandler(stream)
 
 
@@ -23,8 +23,7 @@ class StatusError(Exception):
     ...
 
 
-class Status():
-
+class Status:
     jobs: Sequence[Job]
     jobs_submit: int
     jobs_submitted: int
@@ -36,12 +35,11 @@ class Status():
     def __init__(self, jobs=Sequence[Job]):
         self.jobs = jobs
 
-        debug('Case directories: %s', self.jobs)
+        debug("Case directories: %s", self.jobs)
 
-        debug('Total number of jobs: %i', len(self.jobs))
+        debug("Total number of jobs: %i", len(self.jobs))
 
     def update_status(self):
-
         self.n_submit_script = sum(job.has_submit_script for job in self.jobs)
         self.n_status = sum(job.has_status for job in self.jobs)
 
@@ -57,29 +55,30 @@ class Status():
         """Stateless status."""
         self.update_status()
 
-        msg = 'Total number of directories with %-17s : %i'
+        msg = "Total number of directories with %-17s : %i"
 
-        info(msg, 'submit script', self.n_submit_script)
-        info(msg, 'unsubmitted jobs', self.n_submit_script - self.n_status)
-        info(msg, 'status script', self.n_status)
-        info(msg, 'completed status', self.n_completed)
-        info(msg, 'failed status', self.n_failed)
-        info(msg, 'running status', self.n_running)
-        info(msg, 'unknown status', self.n_unknown)
+        info(msg, "submit script", self.n_submit_script)
+        info(msg, "unsubmitted jobs", self.n_submit_script - self.n_status)
+        info(msg, "status script", self.n_status)
+        info(msg, "completed status", self.n_completed)
+        info(msg, "failed status", self.n_failed)
+        info(msg, "running status", self.n_running)
+        info(msg, "unknown status", self.n_unknown)
 
     def progress_status(self):
         """Monitor the directory for status changes."""
         self.update_status()
 
         from tqdm import tqdm
+
         pbar_a = tqdm(total=len(self.jobs), position=0)
-        pbar_a.set_description('Submitted jobs            ...')
+        pbar_a.set_description("Submitted jobs            ...")
         pbar_b = tqdm(total=self.n_submit_script, position=1)
-        pbar_b.set_description('Running jobs              ...')
+        pbar_b.set_description("Running jobs              ...")
         pbar_c = tqdm(total=self.n_submit_script, position=2)
-        pbar_c.set_description('Completed jobs            ...')
+        pbar_c.set_description("Completed jobs            ...")
         pbar_d = tqdm(total=self.n_submit_script, position=3)
-        pbar_d.set_description('Failed? jobs              ...')
+        pbar_d.set_description("Failed? jobs              ...")
         while self.n_completed < self.n_submit_script:
             pbar_a.n = self.n_submitted
             pbar_b.n = self.n_running
@@ -94,6 +93,7 @@ class Status():
 
     def detailed_status(self):
         from tqdm import tqdm
+
         """detailed_status of all separate runs."""
         monitors = []
         for i, job in enumerate(self.jobs):
@@ -107,7 +107,7 @@ class Status():
             sleep(5)
 
 
-class Monitor():
+class Monitor:
     """Convenience class to keep track of submissions and update progress
     bars."""
 
@@ -124,7 +124,7 @@ class Monitor():
 
         infile = job.in_file
         if not infile.exists():
-            debug('%s does not exist, but the job is running', infile)
+            debug("%s does not exist, but the job is running", infile)
             return
 
         self.start = jetto_config.start_time
@@ -143,30 +143,31 @@ class Monitor():
         More info:
         https://github.com/duqtools/duqtools/issues/337
         """
-        msg = ('Cannot show detailed status, `nlist2.KWMAIN` flag'
-               ' is not set to 1 in `{self.job.status_file}`')
-        if jetto_config['kwmain'] != 1:
+        msg = (
+            "Cannot show detailed status, `nlist2.KWMAIN` flag"
+            " is not set to 1 in `{self.job.status_file}`"
+        )
+        if jetto_config["kwmain"] != 1:
             raise StatusError(msg)
 
     def set_status(self):
         status = self.job.status()
 
-        self.pbar.set_description(f'{self.job.path.name:8s}, {status:12s}')
+        self.pbar.set_description(f"{self.job.path.name:8s}, {status:12s}")
         self.pbar.refresh()
 
         return status
 
     def get_steptime(self):
         if not self.job.out_file.exists():
-            debug(
-                f'{self.job.out_file} does not exists, but the job is running')
+            debug(f"{self.job.out_file} does not exists, but the job is running")
             return None
 
         of = self.job.out_file
-        cmd = f'tac {of} | grep -m 1 ^\\s*STEP'
+        cmd = f"tac {of} | grep -m 1 ^\\s*STEP"
         ret = sp.run(cmd, shell=True, capture_output=True)
         if len(ret.stdout) > 0:
-            return float(ret.stdout.split('=')[2].lstrip(' ').split(' ')[0])
+            return float(ret.stdout.split("=")[2].lstrip(" ").split(" ")[0])
         return None
 
     def update(self):
@@ -183,16 +184,11 @@ class Monitor():
         if steptime:
             self.time = steptime
 
-        self.pbar.n = int(100 * (self.time - self.start) /
-                          (self.end - self.start))
+        self.pbar.n = int(100 * (self.time - self.start) / (self.end - self.start))
         self.pbar.refresh()
 
 
-def status(*,
-           cfg: Config,
-           progress: bool = False,
-           detailed: bool = False,
-           **kwargs):
+def status(*, cfg: Config, progress: bool = False, detailed: bool = False, **kwargs):
     """Show status of runs.
 
     Parameters
@@ -202,7 +198,7 @@ def status(*,
     detailed : bool
         Show detailed progress for every job.
     """
-    debug('Submit config: %s', cfg.system)
+    debug("Submit config: %s", cfg.system)
 
     runs = Locations(cfg=cfg).runs
     jobs = [Job(run.dirname, cfg=cfg) for run in runs]

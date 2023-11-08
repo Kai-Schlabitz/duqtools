@@ -13,25 +13,28 @@ from ..schema import BaseModel, IDSOperation, RootModel
 
 
 class Run(BaseModel):
-    dirname: Path = Field(description='Directory of run')
-    shortname: Optional[Path] = Field(
-        None, description='Short name (`dirname.name`)')
+    dirname: Path = Field(description="Directory of run")
+    shortname: Optional[Path] = Field(None, description="Short name (`dirname.name`)")
     data_in: Optional[ImasBaseModel] = Field(None)
     data_out: Optional[ImasBaseModel] = Field(None)
-    operations: Optional[list[Union[IDSOperation, JettoOperation, list[Union[
-        IDSOperation, JettoOperation]]]]] = Field(None)
+    operations: Optional[
+        list[
+            Union[
+                IDSOperation, JettoOperation, list[Union[IDSOperation, JettoOperation]]
+            ]
+        ]
+    ] = Field(None)
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     def shortname_compat(cls, root):
         # Compatibility with old runs.yaml
-        if 'shortname' not in root and 'dirname' in root:
-            root['shortname'] = root['dirname'].name
+        if "shortname" not in root and "dirname" in root:
+            root["shortname"] = root["dirname"].name
         return root
 
     def to_imas_handle(self) -> ImasHandle:
         if not self.data_out:
-            raise NotImplementedError(
-                'Run has no data_out, necessary for mapping')
+            raise NotImplementedError("Run has no data_out, necessary for mapping")
         handle = ImasHandle.model_validate(self.data_out, from_attributes=True)
         return handle
 

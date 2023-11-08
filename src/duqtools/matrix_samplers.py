@@ -38,10 +38,9 @@ def _sampler(func, *iterables, n_samples: int, **kwargs) -> list[Any]:
     return samples
 
 
-def latin_hypercube(*iterables,
-                    n_samples: int,
-                    seed: Optional[int] = None,
-                    **kwargs) -> list[Any]:
+def latin_hypercube(
+    *iterables, n_samples: int, seed: Optional[int] = None, **kwargs
+) -> list[Any]:
     """Sample input iterables using Latin hypercube sampling (LHS).
 
     Uses `scipy.stats.qmc.LatinHyperCube`.
@@ -60,16 +59,12 @@ def latin_hypercube(*iterables,
     samples : list[Any]
         List of sampled input arguments.
     """
-    return _sampler(qmc.LatinHypercube,
-                    *iterables,
-                    n_samples=n_samples,
-                    seed=seed)
+    return _sampler(qmc.LatinHypercube, *iterables, n_samples=n_samples, seed=seed)
 
 
-def sobol(*iterables,
-          n_samples: int,
-          seed: Optional[int] = None,
-          **kwargs) -> list[Any]:
+def sobol(
+    *iterables, n_samples: int, seed: Optional[int] = None, **kwargs
+) -> list[Any]:
     """Sample input iterables using the Sobol sampling method for generating
     low discrepancy sequences.
 
@@ -94,10 +89,9 @@ def sobol(*iterables,
     return _sampler(qmc.Sobol, *iterables, n_samples=n_samples, seed=seed)
 
 
-def halton(*iterables,
-           n_samples: int,
-           seed: Optional[int] = None,
-           **kwargs) -> list[Any]:
+def halton(
+    *iterables, n_samples: int, seed: Optional[int] = None, **kwargs
+) -> list[Any]:
     """Sample input iterables using the Halton sampling method.
 
     Uses `scipy.stats.qmc.Halton`.
@@ -120,11 +114,11 @@ def halton(*iterables,
 
 
 _SAMPLERS = {
-    'latin-hypercube': latin_hypercube,
-    'halton': halton,
-    'sobol': sobol,
-    'low-discrepancy-sequence': sobol,
-    'cartesian-product': cartesian_product,
+    "latin-hypercube": latin_hypercube,
+    "halton": halton,
+    "sobol": sobol,
+    "low-discrepancy-sequence": sobol,
+    "cartesian-product": cartesian_product,
 }
 
 

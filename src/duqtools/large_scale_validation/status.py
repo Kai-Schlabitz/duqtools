@@ -22,11 +22,11 @@ def status(*, progress: bool, detailed: bool, pattern: str, **kwargs):
         Show status only for subdirectories matching this glob pattern
     """
     if pattern is None:
-        pattern = '**'
+        pattern = "**"
 
     cwd = Path.cwd()
 
-    config_files = cwd.glob(f'{pattern}/duqtools.yaml')
+    config_files = cwd.glob(f"{pattern}/duqtools.yaml")
 
     all_jobs: list[Job] = []
 
@@ -37,8 +37,7 @@ def status(*, progress: bool, detailed: bool, pattern: str, **kwargs):
         cfg = load_config(config_file)
 
         if not cfg.system:
-            raise StatusError(
-                f'Status field required in config file: {config_file}')
+            raise StatusError(f"Status field required in config file: {config_file}")
 
         config_dir = config_file.parent
 
@@ -50,9 +49,9 @@ def status(*, progress: bool, detailed: bool, pattern: str, **kwargs):
 
         dirname = config_file.parent.relative_to(cwd)
         tag = cfg.tag
-        status = ''.join(job.status_symbol for job in jobs)
+        status = "".join(job.status_symbol for job in jobs)
 
-        click.echo(f'{dirname} ({tag}): {status}')
+        click.echo(f"{dirname} ({tag}): {status}")
 
     click.echo()
 
