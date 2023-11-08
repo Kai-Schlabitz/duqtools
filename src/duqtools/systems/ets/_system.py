@@ -175,7 +175,7 @@ class Ets6System(AbstractSystem):
         self, run: Path, inp: ImasHandle, out: ImasHandle, template_drc: Path
     ):
         # raise NotImplementedError('update_imas_location')
-        new_input = []
+        new_input = list()
         cfg_filename = template_drc.name
         with open(run / cfg_filename) as f:
             for line in f.readlines():

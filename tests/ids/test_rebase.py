@@ -55,19 +55,19 @@ def expected_standardized():
     return xr.Dataset.from_dict(
         {
             "coords": {
-                "time": {"dims": ("time",), "attrs": {}, "data": [23, 24, 25]},
+                "time": {"dims": ("time",), "attrs": dict(), "data": [23, 24, 25]},
                 "xvar": {
                     "dims": ("xvar",),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                 },
             },
-            "attrs": {},
+            "attrs": dict(),
             "dims": {"time": 3, "xvar": 10},
             "data_vars": {
                 "yvar": {
                     "dims": ("time", "xvar"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [0.0, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0],
                         [0.0, 2.0, 4.0, 10.0, 16.0, 26.0, 36.0, 50.0, 64.0, 82.0],
@@ -91,19 +91,19 @@ def expected_grid():
     return xr.Dataset.from_dict(
         {
             "coords": {
-                "time": {"dims": ("time",), "attrs": {}, "data": [23, 24, 25]},
+                "time": {"dims": ("time",), "attrs": dict(), "data": [23, 24, 25]},
                 "xvar": {
                     "dims": ("xvar",),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [-0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
                 },
             },
-            "attrs": {},
+            "attrs": dict(),
             "dims": {"time": 3, "xvar": 9},
             "data_vars": {
                 "yvar": {
                     "dims": ("time", "xvar"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [-0.5, 0.0, 0.5, 1.0, 2.5, 4.0, 6.5, 9.0, 12.5],
                         [-1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 7.0, 10.0, 13.0],
@@ -122,21 +122,21 @@ def expected_time():
             "coords": {
                 "xvar": {
                     "dims": ("xvar",),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0],
                 },
                 "time": {
                     "dims": ("time",),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [22.5, 23.0, 23.5, 24.0, 24.5],
                 },
             },
-            "attrs": {},
+            "attrs": dict(),
             "dims": {"time": 5, "xvar": 10},
             "data_vars": {
                 "yvar": {
                     "dims": ("time", "xvar"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [0.0, 0.5, 4.0, 8.5, 16.0, 24.5, 36.0, 48.5, 64.0, 80.5],
                         [0.0, 1.0, 4.0, 9.0, 16.0, 25.0, 36.0, 49.0, 64.0, 81.0],

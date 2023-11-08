@@ -71,7 +71,7 @@ def submit(
 
     dirs = [file.parent for file in cwd.glob(f"{pattern}/runs.yaml")]
 
-    jobs: list[Job] = []
+    jobs: list[Job] = list()
 
     for drc in dirs:
         config_file = drc / "duqtools.yaml"

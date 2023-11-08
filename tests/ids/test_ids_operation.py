@@ -33,7 +33,7 @@ def get_test_var(path):
         name="var",
         path=path,
         ids="test",
-        dims=[],
+        dims=list(),
     )
 
 

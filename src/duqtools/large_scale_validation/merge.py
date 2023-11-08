@@ -30,7 +30,7 @@ def merge(force: bool, var_names: Sequence[str], **kwargs):
 
     config_files = cwd.glob("**/duqtools.yaml")
 
-    target_handles = {}
+    target_handles = dict()
 
     for config_file in config_files:
         run_name = config_file.parent.name

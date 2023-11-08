@@ -41,7 +41,7 @@ jetto_lookup = lookup.from_file(lookup_file)
 
 
 def _get_jetto_extra(filenames: List[str], *, jset):
-    jetto_extra: List[str] = []
+    jetto_extra: List[str] = list()
     for regex in _EXTRA_FILE_REGEXES:
         jetto_extra.extend(filter(regex.match, filenames))
 

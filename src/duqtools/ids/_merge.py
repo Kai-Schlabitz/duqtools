@@ -41,7 +41,7 @@ def merge_data(
     from ..config import var_lookup
 
     # Add dimensions to variables
-    variable_dict = {}
+    variable_dict = dict()
 
     for variable in variables:
         variable_dict[variable.name] = variable

@@ -54,12 +54,12 @@ def _get_dataset(handles, variable, *, include_error: bool = False):
     grid_var = variable["dims"][1]
     variables = [data_var, time_var, grid_var]
 
-    datasets = []
+    datasets = list()
 
     if include_error:
         variables.append(var_lookup.error_upper(data_var))
 
-    runs = []
+    runs = list()
 
     for name, handle in handles.items():
         handle = ImasHandle(**handle)

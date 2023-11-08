@@ -101,7 +101,7 @@ class Variables:
 
     def __init__(self, *, handle: ImasHandle):
         self.handle = handle
-        self._ids_cache: dict[str, IDSMapping] = {}
+        self._ids_cache: dict[str, IDSMapping] = dict()
 
     def _get_ids(self, ids: str):
         """Cache ids lookups to avoid repeated data reads."""

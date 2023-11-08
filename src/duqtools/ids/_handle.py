@@ -232,7 +232,7 @@ class ImasHandle(ImasBaseModel):
 
     def get_all_variables(
         self,
-        extra_variables: Sequence[IDSVariableModel] = [],
+        extra_variables: Sequence[IDSVariableModel] = list(),
         squash: bool = True,
         ids: str = "core_profiles",
         **kwargs,

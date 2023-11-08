@@ -71,7 +71,7 @@ def test_submit(duqduq_tmpdir):
 def test_status(duqduq_tmpdir):
     with work_directory(duqduq_tmpdir):
         runner = CliRunner()
-        ret = runner.invoke(cli.cli_status, [])
+        ret = runner.invoke(cli.cli_status, list())
 
     assert ret.exit_code == 0
     assert ret.output.startswith("Status codes:")

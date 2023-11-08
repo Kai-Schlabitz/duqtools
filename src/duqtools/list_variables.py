@@ -47,7 +47,7 @@ def list_variables(*, cfg: Config, **kwargs):
         Unused.
     """
     extra_variables = (
-        cfg.extra_variables.to_variable_dict() if cfg.extra_variables else {}
+        cfg.extra_variables.to_variable_dict() if cfg.extra_variables else dict()
     )
 
     grouped_ids_vars = var_lookup.groupby_ids()

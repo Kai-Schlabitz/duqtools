@@ -76,7 +76,7 @@ def read_imas_handles_from_file(inp: PathLike) -> dict[str, ImasHandle]:
     inp = Path(inp)
 
     if inp.suffix == ".csv":
-        handles = {}
+        handles = dict()
         with open(inp) as f:
             has_header = csv.Sniffer().has_header("".join(f.readlines(3)))
             f.seek(0)

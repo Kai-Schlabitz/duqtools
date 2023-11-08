@@ -78,7 +78,7 @@ class CreateManager:
 
         sampled_ops_lists = matrix_sampler(*matrix, **dict(self.options.sampler))
 
-        ops_dict = {}
+        ops_dict = dict()
         for i, ops_list in enumerate(sampled_ops_lists):
             name = f"{RUN_PREFIX}{i:04d}"
             ops_dict[name] = [*base_ops, *ops_list]

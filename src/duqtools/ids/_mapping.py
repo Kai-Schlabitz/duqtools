@@ -56,9 +56,9 @@ class IDSMapping(Mapping):
 
         # All available data fields are stored in this set.
         self._keys: set[str] = set()
-        self._paths: dict[str, Any] = {}
+        self._paths: dict[str, Any] = dict()
 
-        self.dive(ids, [])
+        self.dive(ids, list())
 
     def __repr__(self):
         s = f"{self.__class__.__name__}(\n"
@@ -239,7 +239,7 @@ class IDSMapping(Mapping):
 
         cur = self._paths
         for part in path[:-1]:
-            cur.setdefault(part, {})
+            cur.setdefault(part, dict())
             cur = cur[part]
         cur[path[-1]] = str_path
 
@@ -284,7 +284,7 @@ class IDSMapping(Mapping):
 
         pat = re.compile(pattern)
 
-        new = {}
+        new = dict()
         for key in self._keys:
             m = pat.match(key)
             if m:
@@ -295,7 +295,7 @@ class IDSMapping(Mapping):
         return new
 
     def _read_array_from_parts(self, *parts: str):
-        arr = []
+        arr = list()
         root, sub, *remaining = parts
         nodes = self[root]
 
@@ -350,7 +350,7 @@ class IDSMapping(Mapping):
 
         from duqtools.config import lookup_vars
 
-        xr_data_vars: dict[str, tuple[list[str], np.ndarray]] = {}
+        xr_data_vars: dict[str, tuple[list[str], np.ndarray]] = dict()
 
         variables = lookup_vars(variables)
 

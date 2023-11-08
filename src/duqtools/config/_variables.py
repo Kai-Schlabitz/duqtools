@@ -158,7 +158,7 @@ def lookup_vars(
     If str, look up the variable from the `var_lookup`. Else, check if
     the variable is an `IDSVariableModel`.
     """
-    var_models = []
+    var_models = list()
     for var in variables:
         if isinstance(var, str):
             if var.endswith(ERROR_SUFFIX):

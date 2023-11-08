@@ -9,7 +9,7 @@ from ._basemodel import BaseModel
 class LinSpace(BaseModel):
     """Generated evenly spaced numbers over a specified interval.
 
-    See the implementation of [numpy.linspace][] for more details.
+    See the implementation of [numpy.linspace]list() for more details.
     """
 
     start: float = Field(description="Start value of the sequence.")
@@ -26,7 +26,7 @@ class LinSpace(BaseModel):
 class ARange(BaseModel):
     """Generate evenly spaced numbers within a given interval.
 
-    See the implementation of [numpy.arange][] for more details.
+    See the implementation of [numpy.arange]list() for more details.
     """
 
     start: float = Field(description="Start of the interval. Includes this value.")

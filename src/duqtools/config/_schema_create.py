@@ -60,7 +60,7 @@ class CreateConfigModel(BaseModel):
     )
 
     operations: list[Operation] = Field(
-        default=[],
+        default=list(),
         description="""
         These `operations` are always applied to the data.
         All operations specified here are added to any operations sampled
@@ -89,7 +89,7 @@ class CreateConfigModel(BaseModel):
     )
 
     dimensions: list[Union[CoupledDim, OperationDim]] = Field(
-        default=[],
+        default=list(),
         description=f(
             """
         The `dimensions` specifies the dimensions of the matrix to sample

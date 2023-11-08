@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 
 def jettovar_to_json(variable: JettoVar):
-    jsetfields = []
-    nmlfields = []
+    jsetfields = list()
+    nmlfields = list()
     for field in variable.keys:
         if isinstance(field, JsetField):
             jsetfields.append(field)
@@ -30,7 +30,7 @@ def jettovar_to_json(variable: JettoVar):
     if len(jsetfields) > 0:
         var_dict["jset_id"] = jsetfields[0].field
     if len(jsetfields) > 1:
-        var_dict["jset_flex_id"] = []  # type: ignore
+        var_dict["jset_flex_id"] = list()  # type: ignore
         for field in jsetfields[1:]:
             var_dict["jset_flex_id"].append(field.field)  # type: ignore
 

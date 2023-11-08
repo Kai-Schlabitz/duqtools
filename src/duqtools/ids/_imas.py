@@ -23,11 +23,11 @@ try:
 
         def __init__(self):
             xml.sax.handler.ContentHandler.__init__(self)
-            self.idss = []
+            self.idss = list()
 
         def startElement(self, name: str, attrs):
             if name == "IDS":
-                ids = {}
+                ids = dict()
                 for i in attrs.getNames():
                     ids[i] = attrs.getValue(i)
                 self.idss.append(ids)

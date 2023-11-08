@@ -18,18 +18,18 @@ TIME_VAR = Variable(
 def expected_dataset_no_index():
     return xr.Dataset.from_dict(
         {
-            "coords": {"time": {"dims": ("time",), "attrs": {}, "data": [23, 24, 25]}},
-            "attrs": {},
+            "coords": {"time": {"dims": ("time",), "attrs": dict(), "data": [23, 24, 25]}},
+            "attrs": dict(),
             "dims": {"x": 10, "time": 3},
             "data_vars": {
                 "xvar": {
                     "dims": ("x",),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                 },
                 "yvar": {
                     "dims": ("x",),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [0, 1, 4, 9, 16, 25, 36, 49, 64, 81],
                 },
             },
@@ -41,10 +41,10 @@ def expected_dataset_no_index():
 def expected_dataset_0d():
     return xr.Dataset.from_dict(
         {
-            "coords": {},
-            "attrs": {},
+            "coords": dict(),
+            "attrs": dict(),
             "dims": {"x": 1},
-            "data_vars": {"xval": {"dims": ("x",), "attrs": {}, "data": [123]}},
+            "data_vars": {"xval": {"dims": ("x",), "attrs": dict(), "data": [123]}},
         }
     )
 
@@ -53,13 +53,13 @@ def expected_dataset_0d():
 def expected_dataset_1d():
     return xr.Dataset.from_dict(
         {
-            "coords": {"time": {"dims": ("time",), "attrs": {}, "data": [23, 24, 25]}},
-            "attrs": {},
+            "coords": {"time": {"dims": ("time",), "attrs": dict(), "data": [23, 24, 25]}},
+            "attrs": dict(),
             "dims": {"time": 3, "x": 10},
             "data_vars": {
                 "xvar": {
                     "dims": ("time", "x"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18],
@@ -68,7 +68,7 @@ def expected_dataset_1d():
                 },
                 "yvar": {
                     "dims": ("time", "x"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [0, 1, 4, 9, 16, 25, 36, 49, 64, 81],
                         [0, 4, 16, 36, 64, 100, 144, 196, 256, 324],
@@ -84,13 +84,13 @@ def expected_dataset_1d():
 def expected_dataset_2d():
     return xr.Dataset.from_dict(
         {
-            "coords": {"time": {"dims": ("time",), "attrs": {}, "data": [23, 24, 25]}},
-            "attrs": {},
+            "coords": {"time": {"dims": ("time",), "attrs": dict(), "data": [23, 24, 25]}},
+            "attrs": dict(),
             "dims": {"time": 3, "x": 5, "y": 5},
             "data_vars": {
                 "xvar": {
                     "dims": ("time", "x", "y"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [
                             [0, 1, 2, 3, 4],
@@ -117,7 +117,7 @@ def expected_dataset_2d():
                 },
                 "yvar": {
                     "dims": ("time", "x", "y"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [
                             [0, 1, 2, 3, 4],
@@ -152,14 +152,14 @@ def expected_dataset_2d_ion():
     return xr.Dataset.from_dict(
         {
             "coords": {
-                "time": {"dims": ("time",), "attrs": {}, "data": [23, 24, 25]},
+                "time": {"dims": ("time",), "attrs": dict(), "data": [23, 24, 25]},
             },
-            "attrs": {},
+            "attrs": dict(),
             "dims": {"time": 3, "x": 5, "y": 5},
             "data_vars": {
                 "xvar": {
                     "dims": ("time", "x", "y"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [
                             [0, 1, 2, 3, 4],
@@ -186,7 +186,7 @@ def expected_dataset_2d_ion():
                 },
                 "ions": {
                     "dims": ("time", "ion", "x", "y"),
-                    "attrs": {},
+                    "attrs": dict(),
                     "data": [
                         [
                             [
@@ -337,7 +337,7 @@ def test_empty_var_ok(sample_data):
 
     dataset = sample_data.to_xarray(variables=(EmptyVar,), empty_var_ok=True)
 
-    empty = {"coords": {}, "attrs": {}, "dims": {}, "data_vars": {}}
+    empty = {"coords": dict(), "attrs": dict(), "dims": dict(), "data_vars": dict()}
     assert dataset.to_dict() == empty
 
 

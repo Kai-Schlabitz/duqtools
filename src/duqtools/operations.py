@@ -109,7 +109,7 @@ class Operation(LongDescription):
     @field_validator("kwargs")
     def validate_kwargs(cls, v):
         if v is None:
-            v = {}
+            v = dict()
         return v
 
 

@@ -173,7 +173,7 @@ def get_resubmit_jobs(
     -------
     list[Job]
     """
-    jobs: list[Job] = []
+    jobs: list[Job] = list()
     run_dict = {run.shortname: run for run in locations.runs}
     for name in resubmit_names:
         if name in run_dict:  # check for shortname

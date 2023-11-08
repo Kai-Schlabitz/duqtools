@@ -44,7 +44,7 @@ class Run(BaseModel):
 
 
 class Runs(RootModel):
-    root: list[Run] = []
+    root: list[Run] = list()
 
     def __iter__(self):
         yield from self.root

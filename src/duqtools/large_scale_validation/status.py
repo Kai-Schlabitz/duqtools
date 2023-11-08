@@ -28,7 +28,7 @@ def status(*, progress: bool, detailed: bool, pattern: str, **kwargs):
 
     config_files = cwd.glob(f"{pattern}/duqtools.yaml")
 
-    all_jobs: list[Job] = []
+    all_jobs: list[Job] = list()
 
     click.echo(Job.status_symbol_help())
     click.echo()
